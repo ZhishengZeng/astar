@@ -1,13 +1,3 @@
-*.o
 .vscode
-.vs
-.VSCodeCounter
-.scannerwork
-*.log
-*.rpt
-src/OpenDB
-cmake-build-release
-cmake-build-debug
 bin
 build
-gr_temp_data

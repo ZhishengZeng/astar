@@ -1,88 +1,89 @@
 /*
  * @Author: ZengZhisheng
  * @Date: 2021-06-18 19:13:23
- * @LastEditTime: 2021-06-18 19:19:11
- * @LastEditors: ZengZhisheng
  * @Description:
  * @FilePath: /AStar/src/Model.cpp
  */
+
 #include "Model.h"
+
+#include "Util.h"
 namespace astar {
-void Module::initNodeMat(int length, int width)
+
+void Model::setMapSize(int x_grids, int y_grids)
 {
-  // clear
-  for (size_t i = 0; i < _node_mat.size(); i++) {
-    _node_mat[i].clear();
-  }
-  _node_mat.clear();
-  // init
-  _node_mat.resize(length);
-  for (int i = 0; i < length; i++) {
-    _node_mat[i].resize(width);
-  }
-  for (size_t i = 0; i < _node_mat.size(); i++) {
-    for (size_t j = 0; j < _node_mat[i].size(); j++) {
-      _node_mat[i][j].set_coord(i, j);
+  assert(x_grids > 0 && y_grids > 0);
+
+  _grid_map.resize(x_grids, y_grids);
+  for (int i = 0; i < _grid_map.get_x_grids(); i++) {
+    for (int j = 0; j < _grid_map.get_y_grids(); j++) {
+      _grid_map[i][j].set_coord(i, j);
     }
   }
 }
 
-bool isNoneType(Node& node)
+Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
 {
-  return node.get_type() == NodeType::kNone;
+  assert(0 <= coord.get_x() && coord.get_x() < _grid_map.get_x_grids());
+  assert(0 <= coord.get_y() && coord.get_y() < _grid_map.get_y_grids());
+
+  Node& node = _grid_map[coord.get_x()][coord.get_y()];
+  if (node.get_type() == NodeType::kNone) {
+    node.set_type(node_type);
+    return &node;
+  } else {
+    std::cout << "[Error] [" << coord.get_x() << " , " << coord.get_y()
+              << "] type is not null!!" << std::endl;
+    exit(1);
+  }
 }
 
-void Module::initStartPoint(int start_x, int start_y)
+void Model::setObstacle(const std::vector<Coordinate>& obs_coord_list)
 {
-  Node& node = _node_mat[start_x][start_y];
-  if (isNoneType(node)) {
-    node.set_type(NodeType::kStart);
-    _start_node = &node;
-  } else {
-    std::cout << "[Error] Set start point type isn't kNone!!" << std::endl;
-    exit(1);
+  for (size_t i = 0; i < obs_coord_list.size(); i++) {
+    setNode(obs_coord_list[i], NodeType::kObs);
   }
 }
-void Module::initEndPoint(int end_x, int end_y)
+
+void Model::showResult()
 {
-  Node& node = _node_mat[end_x][end_y];
-  if (isNoneType(node)) {
-    node.set_type(NodeType::kEnd);
-    _end_node = &node;
-  } else {
-    std::cout << "[Error] Set end point type isn't kNone!!" << std::endl;
-    exit(1);
-  }
+  setOnPath(true);
+  printGridMap();
+  setOnPath(false);
 }
-void Module::appendObsPoint(int obs_x, int obs_y)
+
+void Model::setOnPath(const bool on_path)
 {
-  Node& node = _node_mat[obs_x][obs_y];
-  if (isNoneType(node)) {
-    node.set_type(NodeType::kObs);
-  } else {
-    std::cout << "[Error] Set obs point type isn't kNone!!" << std::endl;
-    exit(1);
+  if (_curr_node == nullptr) {
+    return;
   }
+  Node* temp_node = _curr_node;
+  while (temp_node->get_coord() != _start_node->get_coord()) {
+    temp_node->set_on_path(on_path);
+    temp_node = temp_node->get_parent_node();
+  }
+  _start_node->set_on_path(on_path);
 }
+
 void printNode(Node& node)
 {
-  double curr_cost = node.get_known_cost();
-  double est_cost = node.get_est_cost();
+  int curr_cost = node.get_known_cost();
+  int est_cost = node.get_est_cost();
 
   switch (node.get_type()) {
     case NodeType::kNone:
       switch (node.get_state()) {
         case NodeState::kNone:
-          std::cout << "\33[47m[?+?]\033[0m";
+          printf("\33[47m[%02d+%02d]\033[0m", 0, 0);
           break;
         case NodeState::kOpen:
-          std::cout << "\33[41m[" << curr_cost << "+" << est_cost << "]\033[0m";
+          printf("\33[41m[%02d+%02d]\033[0m", curr_cost, est_cost);
           break;
         case NodeState::kClose:
           if (node.get_on_path()) {
-            std::cout << "\33[45;30m[" << curr_cost << "+" << est_cost << "]\033[0m";
+            printf("\33[45;30m[%02d+%02d]\033[0m", curr_cost, est_cost);
           } else {
-            std::cout << "\33[45m[" << curr_cost << "+" << est_cost << "]\033[0m";
+            printf("\33[45m[%02d+%02d]\033[0m", curr_cost, est_cost);
           }
           break;
         default:
@@ -91,180 +92,154 @@ void printNode(Node& node)
       }
       break;
     case NodeType::kObs:
-      std::cout << "\33[40m[OBS]\033[0m";
+      printf("\33[40m[%02d+%02d]\033[0m", 0, 0);
       break;
     case NodeType::kStart:
-      std::cout << "\33[42m[" << curr_cost << "+" << est_cost << "]\033[0m";
+      printf("\33[42m[%02d+%02d]\033[0m", curr_cost, est_cost);
       break;
     case NodeType::kEnd:
-      std::cout << "\33[44m[" << curr_cost << "+" << est_cost << "]\033[0m";
+      printf("\33[44m[%02d+%02d]\033[0m", curr_cost, est_cost);
       break;
     default:
       std::cout << "default???";
       break;
   }
 }
-void Module::printNodeMat()
+
+void Model::printGridMap()
 {
-  updatePath();
   std::cout << "--------------------------------------------------\n";
-  for (int j = (_node_mat[0].size() - 1); j >= 0; j--) {
-    for (size_t i = 0; i < _node_mat.size(); i++) {
-      printNode(_node_mat[i][j]);
+  for (int j = _grid_map.get_y_grids() - 1; j >= 0; j--) {
+    for (int i = 0; i < _grid_map.get_x_grids(); i++) {
+      printNode(_grid_map[i][j]);
     }
     std::cout << "\n";
   }
   std::cout << "--------------------------------------------------\n";
-  clearPath();
 }
 
-void Module::updatePath()
+void Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
 {
-  if (_curr_node == nullptr) {
-    return;
-  }
+  double start_time, end_time;
+  start_time = Util::microtime();
 
-  Node* temp_node = _curr_node;
-  while (temp_node->get_coord() != _start_node->get_coord()) {
-    temp_node->set_on_path(true);
-    temp_node = temp_node->get_parent_node();
-  }
-  _start_node->set_on_path(true);
-}
-
-void Module::clearPath()
-{
-  if (_curr_node == nullptr) {
-    return;
-  }
-  Node* temp_node = _curr_node;
-  while (temp_node->get_coord() != _start_node->get_coord()) {
-    temp_node->set_on_path(false);
-    temp_node = temp_node->get_parent_node();
-  }
-  _start_node->set_on_path(false);
-}
-
-void Module::runAStar()
-{
-  printNodeMat();
-  setOpenState(_start_node, _start_node);
+  setStartNode(start_coord);
+  setEndNode(end_coord);
+  initStartNode();
   while (true) {
-    // 搜索最佳点
-    findBestNode();
-    // 判断最佳点是否为终点
-    if (_curr_node->get_coord() == _end_node->get_coord()) {
+#if SHOWSTEPBYSTEP
+    showResult();
+#endif
+    // 搜索最小代价点
+    getMinCostNodeInOpenList();
+    // 是否抵达终点
+    if (_curr_node->isEnd()) {
       break;
-    } else {
-      findCandidateCoords();
     }
-    printNodeMat();
+    addNeighborNodesToOpenList();
+    // 无路可走
+    if (_open_list.empty()) {
+      break;
+    }
   }
-  printNodeMat();
+
+  end_time = Util::microtime();
+  // showResult();
+  std::cout << (_curr_node->isEnd() ? "[Info] Reached the end node!!"
+                                    : "[Info] No Where!!")
+            << " time:" << (end_time - start_time) << std::endl;
 }
 
-void Module::setOpenState(Node* parent_node, Node* node)
+void Model::setStartNode(const Coordinate& coord)
 {
-  _open_list.push_front(node);
+  _start_node = setNode(coord, NodeType::kStart);
+}
+
+void Model::setEndNode(const Coordinate& coord)
+{
+  _end_node = setNode(coord, NodeType::kEnd);
+}
+
+void Model::initStartNode()
+{
+  _curr_node = _start_node;
+  updateEstCost(_start_node);
+  updateParentByCurr(_start_node);
+  addNodeToOpenList(_start_node);
+}
+
+int caculateEstCost(Node* a, Node* b)
+{
+  return std::abs(a->get_coord().get_x() - b->get_coord().get_x())
+         + std::abs(a->get_coord().get_y() - b->get_coord().get_y());
+}
+
+void Model::updateEstCost(Node* node)
+{
+  node->set_est_cost(caculateEstCost(node, _end_node));
+}
+
+void Model::updateParentByCurr(Node* node)
+{
+  node->set_known_cost(_curr_node->get_known_cost() + 1);
+  node->set_parent_node(_curr_node);
+}
+
+void Model::addNodeToOpenList(Node* node)
+{
+  _open_list.push(node);
   node->set_state(NodeState::kOpen);
-  node->set_known_cost(parent_node->get_known_cost() + 1);
-  node->set_est_cost(caculateEstCost(node));
-  node->set_parent_node(parent_node);
 }
 
-void Module::findBestNode()
+void Model::getMinCostNodeInOpenList()
 {
-  std::list<Node*>::iterator min_iter;
-  double min_cost = 9999;
-  for (std::list<Node*>::iterator itor = _open_list.begin(); itor != _open_list.end(); itor++) {
-    if ((*itor)->get_total_cost() < min_cost) {
-      min_cost = (*itor)->get_total_cost();
-      min_iter = itor;
-    }
-  }
-  _curr_node = *min_iter;
-  _open_list.erase(min_iter);
-  setCloseState(_curr_node);
+  _curr_node = _open_list.top();
+  _open_list.pop();
+  _curr_node->set_state(NodeState::kClose);
 }
 
-void Module::setCloseState(Node* node)
-{
-  _close_list.push_back(node);
-  node->set_state(NodeState::kClose);
-}
-
-void Module::findCandidateCoords()
+void Model::addNeighborNodesToOpenList()
 {
   std::vector<Node*> neighbor_node_list;
-  getNeighborNodes(neighbor_node_list);
-  for (size_t i = 0; i < neighbor_node_list.size(); i++) {
-    Node* neighbor_node = neighbor_node_list[i];
-    if (isSkipNode(neighbor_node)) {
+  getNeighborNodesByCurr(neighbor_node_list);
+  for (Node* neighbor_node : neighbor_node_list) {
+    if (neighbor_node->isClose() || neighbor_node->isObs()) {
       continue;
-    } else {
-      if (inOpenList(neighbor_node)) {
-        if (neighbor_node->get_total_cost() > (_curr_node->get_total_cost() + 1)) {
-          double neighbor_know_cost = neighbor_node->get_known_cost() + 1;
-          double neighbor_est_cost = caculateEstCost(neighbor_node);
-          neighbor_node->set_known_cost(neighbor_know_cost);
-          neighbor_node->set_est_cost(neighbor_est_cost);
-          neighbor_node->set_parent_node(_curr_node);
-        }
-      } else {
-        setOpenState(_curr_node, neighbor_node);
+    }
+    if (neighbor_node->isOpen()) {
+      if (currIsBetterThan(neighbor_node->get_parent_node())) {
+        updateParentByCurr(neighbor_node);
       }
+    } else {
+      updateEstCost(neighbor_node);
+      updateParentByCurr(neighbor_node);
+      addNodeToOpenList(neighbor_node);
     }
   }
 }
 
-void Module::getNeighborNodes(std::vector<Node*>& neighbor_node_list)
+void Model::getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list)
 {
   Coordinate& curr_coord = _curr_node->get_coord();
   int curr_coord_x = curr_coord.get_x();
   int curr_coord_y = curr_coord.get_y();
   if (curr_coord_x > 0) {
-    neighbor_node_list.push_back(&_node_mat[curr_coord_x - 1][curr_coord_y]);
+    neighbor_node_list.push_back(&_grid_map[curr_coord_x - 1][curr_coord_y]);
   }
-  if (curr_coord_x < (int) (_node_mat.size() - 1)) {
-    neighbor_node_list.push_back(&_node_mat[curr_coord_x + 1][curr_coord_y]);
+  if (curr_coord_x < (int) (_grid_map.get_x_grids() - 1)) {
+    neighbor_node_list.push_back(&_grid_map[curr_coord_x + 1][curr_coord_y]);
   }
   if (curr_coord_y > 0) {
-    neighbor_node_list.push_back(&_node_mat[curr_coord_x][curr_coord_y - 1]);
+    neighbor_node_list.push_back(&_grid_map[curr_coord_x][curr_coord_y - 1]);
   }
-  if (curr_coord_y < (int) (_node_mat[0].size() - 1)) {
-    neighbor_node_list.push_back(&_node_mat[curr_coord_x][curr_coord_y + 1]);
+  if (curr_coord_y < (int) (_grid_map.get_y_grids() - 1)) {
+    neighbor_node_list.push_back(&_grid_map[curr_coord_x][curr_coord_y + 1]);
   }
 }
 
-bool Module::isSkipNode(Node* node)
+bool Model::currIsBetterThan(Node* node)
 {
-  return (node->get_type() == NodeType::kObs || inCloseList(node));
+  return _curr_node->get_total_cost() < node->get_total_cost();
 }
 
-bool Module::inOpenList(Node* node)
-{
-  for (std::list<Node*>::iterator itor = _open_list.begin(); itor != _open_list.end(); itor++) {
-    if ((*itor)->get_coord() == node->get_coord()) {
-      return true;
-    }
-  }
-  return false;
-}
-
-double Module::caculateEstCost(Node* node)
-{
-  Coordinate& node_coord = node->get_coord();
-  Coordinate& end_node_coord = _end_node->get_coord();
-  return std::abs(node_coord.get_x() - end_node_coord.get_x()) + std::abs(node_coord.get_y() - end_node_coord.get_y());
-}
-
-bool Module::inCloseList(Node* node)
-{
-  for (std::list<Node*>::iterator itor = _close_list.begin(); itor != _close_list.end(); itor++) {
-    if ((*itor)->get_coord() == node->get_coord()) {
-      return true;
-    }
-  }
-  return false;
-}
 }  // namespace astar

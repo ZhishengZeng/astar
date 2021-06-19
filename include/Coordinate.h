@@ -1,11 +1,10 @@
 /*
  * @Author: ZengZhisheng
  * @Date: 2021-06-18 16:49:07
- * @LastEditTime: 2021-06-18 18:06:59
- * @LastEditors: ZengZhisheng
- * @Description: coordinate of node
+ * @Description:
  * @FilePath: /AStar/include/Coordinate.h
  */
+
 #ifndef ASTAR_INCLUDE_COORDINATE_H_
 #define ASTAR_INCLUDE_COORDINATE_H_
 
@@ -14,8 +13,8 @@ namespace astar {
 class Coordinate
 {
  private:
-  int _x;
-  int _y;
+  int _x = 0;
+  int _y = 0;
 
  public:
   Coordinate() {}
@@ -30,6 +29,15 @@ class Coordinate
   // setter
   void set_x(const int x) { _x = x; }
   void set_y(const int y) { _y = y; }
+};
+
+struct cmpCoordinate
+{
+  bool operator()(Coordinate a, Coordinate b)
+  {
+    return a.get_x() != b.get_x() ? a.get_x() < b.get_x()
+                                  : a.get_y() < b.get_y();
+  }
 };
 
 }  // namespace astar
