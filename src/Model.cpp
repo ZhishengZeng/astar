@@ -144,7 +144,7 @@ void Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
   }
 
   end_time = Util::microtime();
-  // showResult();
+  showResult();
   std::cout << (_curr_node->isEnd() ? "[Info] Reached the end node!!"
                                     : "[Info] No Where!!")
             << " time:" << (end_time - start_time) << std::endl;

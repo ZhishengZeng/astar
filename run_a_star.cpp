@@ -14,8 +14,8 @@
 #include "Model.h"
 int main()
 {
-  int x_grids = 400;
-  int y_grids = 800;
+  int x_grids = 20;
+  int y_grids = 40;
   srand((unsigned) time(NULL));
   std::set<astar::Coordinate, astar::cmpCoordinate> coord_set;
   while ((int) coord_set.size() < (x_grids * y_grids / 4)) {
@@ -31,5 +31,6 @@ int main()
   astar_model.setMapSize(x_grids, y_grids);
   astar_model.setObstacle(obs_coord_list);
   astar_model.findPath(coord_list.front(), coord_list.back());
+
   return 0;
 }
