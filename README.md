@@ -1,12 +1,11 @@
 # AStar
 
-# Get Started
+## Get Started
 
 ```
 git clone https://github.com/ZhishengZeng/AStar.git
 cd AStar
-mkdir build
-cd build
+mkdir build && cd build
 cmake ..
 make -j64
 ```
