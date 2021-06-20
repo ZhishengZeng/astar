@@ -3,12 +3,12 @@
 # Get Started
 
 ```
-git clone --recursive https://github.com/PCNL-EDA/iEDA
-cd iEDA
+git clone https://github.com/ZhishengZeng/AStar.git
+cd AStar
 mkdir build
 cd build
 cmake ..
-make
+make -j64
 ```
 
 
