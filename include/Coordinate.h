@@ -12,16 +12,15 @@ namespace astar {
 
 class Coordinate
 {
- private:
-  int _x = 0;
-  int _y = 0;
-
  public:
   Coordinate() {}
   Coordinate(int x, int y) : _x(x), _y(y) {}
   ~Coordinate() {}
 
-  bool operator==(Coordinate& other) { return (_x == other._x && _y == other._y); }
+  bool operator==(Coordinate& other)
+  {
+    return (_x == other._x && _y == other._y);
+  }
   bool operator!=(Coordinate& other) { return !((*this) == other); }
   // getter
   int get_x() const { return _x; }
@@ -29,6 +28,10 @@ class Coordinate
   // setter
   void set_x(const int x) { _x = x; }
   void set_y(const int y) { _y = y; }
+
+ private:
+  int _x = 0;
+  int _y = 0;
 };
 
 struct cmpCoordinate

@@ -28,15 +28,6 @@ enum class NodeState
 
 class Node
 {
- private:
-  Coordinate _coord;
-  NodeType _type = NodeType::kNone;
-  NodeState _state = NodeState::kNone;
-  Node* _parent_node = nullptr;
-  int _known_cost = 0;
-  int _est_cost = 0;
-  bool _on_path = false;
-
  public:
   Node() {}
   ~Node()
@@ -71,6 +62,15 @@ class Node
   bool isObs() { return _type == NodeType::kObs; }
   bool isOpen() { return _state == NodeState::kOpen; }
   bool isClose() { return _state == NodeState::kClose; }
+
+ private:
+  Coordinate _coord;
+  NodeType _type = NodeType::kNone;
+  NodeState _state = NodeState::kNone;
+  Node* _parent_node = nullptr;
+  int _known_cost = 0;
+  int _est_cost = 0;
+  bool _on_path = false;
 };
 
 struct cmpNode

@@ -13,11 +13,6 @@ namespace astar {
 template <typename T>
 class GridMap
 {
- private:
-  size_t _x_grid_num = 0;
-  size_t _y_grid_num = 0;
-  T** _array = nullptr;
-
  public:
   GridMap() {}
   GridMap(const GridMap& other)
@@ -45,6 +40,11 @@ class GridMap
   void init(size_t x_grid_num = 0, size_t y_grid_num = 0);
   void initArray();
   void freeArray();
+
+ private:
+  size_t _x_grid_num = 0;
+  size_t _y_grid_num = 0;
+  T** _array = nullptr;
 };
 
 template <typename T>
