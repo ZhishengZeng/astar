@@ -21,5 +21,7 @@ SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 # SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
 
 
-add_executable(run_a_star ${PROJECT_SOURCE_DIR}/run_a_star.cpp)
-target_link_libraries(run_a_star astar)
+add_executable(answer ${PROJECT_SOURCE_DIR}/tests/answer.cpp)
+add_executable(random ${PROJECT_SOURCE_DIR}/tests/random.cpp)
+target_link_libraries(answer astar)
+target_link_libraries(random astar)

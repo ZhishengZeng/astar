@@ -14,33 +14,64 @@ template <typename T>
 class GridMap
 {
  private:
-  int _x_grids = 0;
-  int _y_grids = 0;
-  T** _t = nullptr;
+  size_t _x_grid_num = 0;
+  size_t _y_grid_num = 0;
+  T** _array = nullptr;
 
  public:
   GridMap() {}
-  ~GridMap() {}
-
-  T* operator[](int i) { return _t[i]; }
+  GridMap(const GridMap& other)
+      : _x_grid_num(other._x_grid_num),
+        _y_grid_num(other._y_grid_num),
+        _array(nullptr)
+  {
+    initArray();
+  }
+  GridMap(GridMap&& other)
+      : _x_grid_num(other._x_grid_num),
+        _y_grid_num(other._y_grid_num),
+        _array(other._array)
+  {
+    other._array = nullptr;
+  }
+  ~GridMap() { freeArray(); }
+  T* operator[](const size_t i) { return _array[i]; }
   // getter
-  int get_x_grids() const { return _x_grids; }
-  int get_y_grids() const { return _y_grids; }
+  size_t get_x_grid_num() const { return _x_grid_num; }
+  size_t get_y_grid_num() const { return _y_grid_num; }
   // setter
 
   // function
-  void resize(int x_grids, int y_grids)
-  {
-    _t = new T*[x_grids];
-    _t[0] = new T[x_grids * y_grids];
-    for (int i = 1; i < x_grids; i++) {
-      _t[i] = _t[i - 1] + y_grids;
-    }
-
-    _x_grids = x_grids;
-    _y_grids = y_grids;
-  }
+  void init(size_t x_grid_num = 0, size_t y_grid_num = 0);
+  void initArray();
+  void freeArray();
 };
+
+template <typename T>
+inline void GridMap<T>::init(size_t x_grid_num, size_t y_grid_num)
+{
+  _x_grid_num = x_grid_num;
+  _y_grid_num = y_grid_num;
+  initArray();
+}
+
+template <typename T>
+inline void GridMap<T>::initArray()
+{
+  freeArray();
+  _array = new T*[_x_grid_num];
+  _array[0] = new T[_x_grid_num * _y_grid_num];
+  for (size_t i = 1; i < _x_grid_num; i++) {
+    _array[i] = _array[i - 1] + _y_grid_num;
+  }
+}
+
+template <typename T>
+inline void GridMap<T>::freeArray()
+{
+  delete[] _array;
+  _array = nullptr;
+}
 }  // namespace astar
 
 #endif  // ASTAR_INCLUDE_MAT_H_

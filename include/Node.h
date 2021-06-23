@@ -39,7 +39,11 @@ class Node
 
  public:
   Node() {}
-  ~Node() {}
+  ~Node()
+  {
+    delete _parent_node;
+    _parent_node = nullptr;
+  }
 
   Coordinate& get_coord() { return _coord; }
   NodeType& get_type() { return _type; }

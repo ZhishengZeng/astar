@@ -32,27 +32,38 @@ class Model
 
  public:
  Model(){}
- ~Model(){}
+ ~Model()
+ {
+   _start_node = nullptr;
+   _end_node = nullptr;
+   _curr_node = nullptr;
+   while (!_open_list.empty()) {
+     Node* a = _open_list.top();
+     _open_list.pop();
+     delete a;
+     a = nullptr;
+   }
+ }
 
-  void setMapSize(int x_grids, int y_grids);
-  Node* setNode(const Coordinate& coord, const NodeType& node_type);
-  void setObstacle(const std::vector<Coordinate>& obs_coord_list);
-  void findPath(const Coordinate& start_coord, const Coordinate& end_coord);
-  void setStartNode(const Coordinate& coord);
-  void setEndNode(const Coordinate& coord);
-  void initStartNode();
-  void updateEstCost(Node* node);
-  void updateParentByCurr(Node* node);
-  void addNodeToOpenList(Node* node);
-  void getMinCostNodeInOpenList();
-  bool reachEndNode();
-  bool isNoWhere();
-  void addNeighborNodesToOpenList();
-  void getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list);
-  bool currIsBetterThan(Node* node);
-  void showResult();
-  void setOnPath(const bool on_path);
-  void printGridMap();
+ void setMapSize(int x_grid_num, int y_grid_num);
+ Node* setNode(const Coordinate& coord, const NodeType& node_type);
+ void setObstacle(const std::vector<Coordinate>& obs_coord_list);
+ void findPath(const Coordinate& start_coord, const Coordinate& end_coord);
+ void setStartNode(const Coordinate& coord);
+ void setEndNode(const Coordinate& coord);
+ void initStartNode();
+ void updateEstCost(Node* node);
+ void updateParentByCurr(Node* node);
+ void addNodeToOpenList(Node* node);
+ void getMinCostNodeInOpenList();
+ bool reachEndNode();
+ bool isNoWhere();
+ void addNeighborNodesToOpenList();
+ void getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list);
+ bool currIsBetterThan(Node* node);
+ void showResult();
+ void setOnPath(const bool on_path);
+ void printGridMap();
 };
 
 }  // namespace astar
