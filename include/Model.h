@@ -7,7 +7,7 @@
 #ifndef ASTAR_INCLUDE_MODEL_H_
 #define ASTAR_INCLUDE_MODEL_H_
 
-#define SHOWSTEPBYSTEP 0
+#define SHOWSTEPBYSTEP 1
 
 #include <assert.h>
 
@@ -25,18 +25,7 @@ class Model
 {
  public:
   Model() {}
-  ~Model()
-  {
-    _start_node = nullptr;
-    _end_node = nullptr;
-    _curr_node = nullptr;
-    while (!_open_list.empty()) {
-      Node* a = _open_list.top();
-      _open_list.pop();
-      delete a;
-      a = nullptr;
-    }
-  }
+  ~Model() { freeModel(); }
 
   void setMapSize(int x_grid_num, int y_grid_num);
   Node* setNode(const Coordinate& coord, const NodeType& node_type);
@@ -53,10 +42,11 @@ class Model
   bool isNoWhere();
   void addNeighborNodesToOpenList();
   void getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list);
-  bool currIsBetterThan(Node* node);
+  bool isCurrBetterThan(Node* node);
   void showResult();
   void setOnPath(const bool on_path);
   void printGridMap();
+  void freeModel();
 
  private:
   GridMap<Node> _grid_map;

@@ -12,8 +12,8 @@
 #include "Model.h"
 int main()
 {
-  int x_grid_num = 800;
-  int y_grid_num = 800;
+  int x_grid_num = 10;
+  int y_grid_num = 10;
   srand((unsigned) time(NULL));
   std::set<astar::Coordinate, astar::cmpCoordinate> coord_set;
   while ((int) coord_set.size() < (x_grid_num * y_grid_num / 4)) {

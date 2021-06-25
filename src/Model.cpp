@@ -134,6 +134,9 @@ void Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
 #endif
     // 搜索最小代价点
     getMinCostNodeInOpenList();
+#if SHOWSTEPBYSTEP
+    showResult();
+#endif
     // 是否抵达终点
     if (_curr_node->isEnd()) {
       break;
@@ -146,7 +149,6 @@ void Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
   }
 
   end_time = Util::microtime();
-  showResult();
   std::cout << (_curr_node->isEnd() ? "[Info] Reached the end node!!"
                                     : "[Info] No Where!!")
             << " time:" << (end_time - start_time) << std::endl;
@@ -209,7 +211,7 @@ void Model::addNeighborNodesToOpenList()
       continue;
     }
     if (neighbor_node->isOpen()) {
-      if (currIsBetterThan(neighbor_node->get_parent_node())) {
+      if (isCurrBetterThan(neighbor_node->get_parent_node())) {
         updateParentByCurr(neighbor_node);
       }
     } else {
@@ -242,6 +244,19 @@ void Model::getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list)
 bool Model::currIsBetterThan(Node* node)
 {
   return _curr_node->get_total_cost() < node->get_total_cost();
+}
+
+void Model::freeModel()
+{
+  _start_node = nullptr;
+  _end_node = nullptr;
+  _curr_node = nullptr;
+
+  while (!_open_list.empty()) {
+    Node* a = _open_list.top();
+    a = nullptr;
+    _open_list.pop();
+  }
 }
 
 }  // namespace astar

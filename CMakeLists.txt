@@ -7,7 +7,6 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 include_directories(
 ${PROJECT_SOURCE_DIR}/include
-${PROJECT_SOURCE_DIR}/util
 )
 
 add_library(astar 
@@ -15,10 +14,10 @@ ${PROJECT_SOURCE_DIR}/src/Model.cpp
 ${PROJECT_SOURCE_DIR}/src/Util.cpp
 )
 
-SET(CMAKE_BUILD_TYPE "Release")
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
-# SET(CMAKE_BUILD_TYPE "Debug")
-# SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
+# SET(CMAKE_BUILD_TYPE "Release")
+# SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+SET(CMAKE_BUILD_TYPE "Debug")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
 
 
 add_executable(answer ${PROJECT_SOURCE_DIR}/tests/answer.cpp)

@@ -30,11 +30,7 @@ class Node
 {
  public:
   Node() {}
-  ~Node()
-  {
-    delete _parent_node;
-    _parent_node = nullptr;
-  }
+  ~Node() { _parent_node = nullptr; }
 
   Coordinate& get_coord() { return _coord; }
   NodeType& get_type() { return _type; }
@@ -45,7 +41,7 @@ class Node
   int get_total_cost() const { return (_known_cost + _est_cost); }
   bool get_on_path() { return _on_path; }
 
-  void set_coord(int x, int y)
+  void set_coord(const int x,const int y)
   {
     _coord.set_x(x);
     _coord.set_y(y);
