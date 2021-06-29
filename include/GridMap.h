@@ -44,6 +44,7 @@ class GridMap
         _array[i][j] = other._array[i][j];
       }
     }
+    return (*this);
   }
   GridMap& operator=(GridMap&& other)
   {
@@ -51,6 +52,7 @@ class GridMap
     _y_grid_num = other._y_grid_num;
     _array = other._array;
     other._array = nullptr;
+    return (*this);
   }
   T* operator[](const size_t i) { return _array[i]; }
   // getter
