@@ -36,7 +36,7 @@ class Coordinate
 
 struct cmpCoordinate
 {
-  bool operator()(Coordinate a, Coordinate b)
+  bool operator()(Coordinate a, Coordinate b) const
   {
     return a.get_x() != b.get_x() ? a.get_x() < b.get_x()
                                   : a.get_y() < b.get_y();

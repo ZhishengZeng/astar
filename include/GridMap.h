@@ -16,20 +16,42 @@ class GridMap
  public:
   GridMap() {}
   GridMap(const GridMap& other)
-      : _x_grid_num(other._x_grid_num),
-        _y_grid_num(other._y_grid_num),
-        _array(nullptr)
   {
+    _x_grid_num = other._x_grid_num;
+    _y_grid_num = other._y_grid_num;
     initArray();
+    for (size_t i = 0; i < other._x_grid_num; i++) {
+      for (size_t j = 0; j < other._y_grid_num; j++) {
+        _array[i][j] = other._array[i][j];
+      }
+    }
   }
   GridMap(GridMap&& other)
-      : _x_grid_num(other._x_grid_num),
-        _y_grid_num(other._y_grid_num),
-        _array(other._array)
   {
+    _x_grid_num = other._x_grid_num;
+    _y_grid_num = other._y_grid_num;
+    _array = other._array;
     other._array = nullptr;
   }
   ~GridMap() { freeArray(); }
+  GridMap& operator=(const GridMap& other)
+  {
+    _x_grid_num = other._x_grid_num;
+    _y_grid_num = other._y_grid_num;
+    initArray();
+    for (size_t i = 0; i < other._x_grid_num; i++) {
+      for (size_t j = 0; j < other._y_grid_num; j++) {
+        _array[i][j] = other._array[i][j];
+      }
+    }
+  }
+  GridMap& operator=(GridMap&& other)
+  {
+    _x_grid_num = other._x_grid_num;
+    _y_grid_num = other._y_grid_num;
+    _array = other._array;
+    other._array = nullptr;
+  }
   T* operator[](const size_t i) { return _array[i]; }
   // getter
   size_t get_x_grid_num() const { return _x_grid_num; }
