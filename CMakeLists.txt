@@ -14,13 +14,13 @@ ${PROJECT_SOURCE_DIR}/src/Model.cpp
 ${PROJECT_SOURCE_DIR}/src/Util.cpp
 )
 
-# SET(CMAKE_BUILD_TYPE "Release")
-# SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
-SET(CMAKE_BUILD_TYPE "Debug")
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
+SET(CMAKE_BUILD_TYPE "Release")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+# SET(CMAKE_BUILD_TYPE "Debug")
+# SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
 
 
-add_executable(answer ${PROJECT_SOURCE_DIR}/tests/answer.cpp)
-add_executable(random ${PROJECT_SOURCE_DIR}/tests/random.cpp)
-target_link_libraries(answer astar)
-target_link_libraries(random astar)
+add_executable(simple_astar ${PROJECT_SOURCE_DIR}/tests/simple.cpp)
+add_executable(random_astar ${PROJECT_SOURCE_DIR}/tests/random.cpp)
+target_link_libraries(simple_astar astar)
+target_link_libraries(random_astar astar)

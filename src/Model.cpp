@@ -227,21 +227,26 @@ void Model::getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list)
   Coordinate& curr_coord = _curr_node->get_coord();
   int curr_coord_x = curr_coord.get_x();
   int curr_coord_y = curr_coord.get_y();
-  if (curr_coord_x > 0) {
-    neighbor_node_list.push_back(&_grid_map[curr_coord_x - 1][curr_coord_y]);
-  }
-  if (curr_coord_x < (int) (_grid_map.get_x_grid_num() - 1)) {
-    neighbor_node_list.push_back(&_grid_map[curr_coord_x + 1][curr_coord_y]);
-  }
-  if (curr_coord_y > 0) {
-    neighbor_node_list.push_back(&_grid_map[curr_coord_x][curr_coord_y - 1]);
-  }
-  if (curr_coord_y < (int) (_grid_map.get_y_grid_num() - 1)) {
-    neighbor_node_list.push_back(&_grid_map[curr_coord_x][curr_coord_y + 1]);
+
+  for (int x = curr_coord_x - 1; x <= curr_coord_x + 1; x++) {
+    for (int y = curr_coord_y - 1; y <= curr_coord_y + 1; y++) {
+      if (x == curr_coord_x && y == curr_coord_y) {
+        continue;
+      }
+      if (isLegalCoord(x, y)) {
+        neighbor_node_list.push_back(&_grid_map[x][y]);
+      }
+    }
   }
 }
 
-bool Model::currIsBetterThan(Node* node)
+bool Model::isLegalCoord(size_t x, size_t y)
+{
+  return (0 <= x && x < _grid_map.get_x_grid_num())
+         && (0 <= y && y < _grid_map.get_y_grid_num());
+}
+
+bool Model::isCurrBetterThan(Node* node)
 {
   return _curr_node->get_total_cost() < node->get_total_cost();
 }
@@ -254,8 +259,8 @@ void Model::freeModel()
 
   while (!_open_list.empty()) {
     Node* a = _open_list.top();
-    a = nullptr;
     _open_list.pop();
+    a = nullptr;
   }
 }
 

@@ -42,6 +42,7 @@ class Model
   bool isNoWhere();
   void addNeighborNodesToOpenList();
   void getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list);
+  bool isLegalCoord(size_t x, size_t y);
   bool isCurrBetterThan(Node* node);
   void showResult();
   void setOnPath(const bool on_path);
