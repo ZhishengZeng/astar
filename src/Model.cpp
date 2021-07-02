@@ -34,7 +34,7 @@ Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
     node.set_type(node_type);
     return &node;
   } else {
-    std::cout << "[Error] [" << coord.get_x() << " , " << coord.get_y()
+    std::cout << "[AStar Error] [" << coord.get_x() << " , " << coord.get_y()
               << "] type is not null!!" << std::endl;
     exit(1);
   }
@@ -69,23 +69,23 @@ void Model::setOnPath(const bool on_path)
 
 void printNode(Node& node)
 {
-  int curr_cost = node.get_known_cost();
-  int est_cost = node.get_est_cost();
+  double curr_cost = node.get_known_cost();
+  double est_cost = node.get_est_cost();
 
   switch (node.get_type()) {
     case NodeType::kNone:
       switch (node.get_state()) {
         case NodeState::kNone:
-          printf("\33[47m[%02d+%02d]\033[0m", 0, 0);
+          printf("\33[47m[%05.2lf+%05.2lf]\033[0m", 0.0, 0.0);
           break;
         case NodeState::kOpen:
-          printf("\33[41m[%02d+%02d]\033[0m", curr_cost, est_cost);
+          printf("\33[41m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
           break;
         case NodeState::kClose:
           if (node.get_on_path()) {
-            printf("\33[45;30m[%02d+%02d]\033[0m", curr_cost, est_cost);
+            printf("\33[45;30m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
           } else {
-            printf("\33[45m[%02d+%02d]\033[0m", curr_cost, est_cost);
+            printf("\33[45m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
           }
           break;
         default:
@@ -94,13 +94,13 @@ void printNode(Node& node)
       }
       break;
     case NodeType::kObs:
-      printf("\33[40m[%02d+%02d]\033[0m", 0, 0);
+      printf("\33[40m[%05.2lf+%05.2lf]\033[0m", 0.0, 0.0);
       break;
     case NodeType::kStart:
-      printf("\33[42m[%02d+%02d]\033[0m", curr_cost, est_cost);
+      printf("\33[42m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
       break;
     case NodeType::kEnd:
-      printf("\33[44m[%02d+%02d]\033[0m", curr_cost, est_cost);
+      printf("\33[44m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
       break;
     default:
       std::cout << "default???";
@@ -120,7 +120,7 @@ void Model::printGridMap()
   std::cout << "--------------------------------------------------\n";
 }
 
-void Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
+bool Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
 {
   double start_time, end_time;
   start_time = Util::microtime();
@@ -148,12 +148,21 @@ void Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
     }
   }
 
-  end_time = Util::microtime();
-  std::cout << (_curr_node->isEnd() ? "[Info] Reached the end node!!"
-                                    : "[Info] No Where!!")
-            << " time:" << (end_time - start_time) << std::endl;
-}
+#if !SHOWSTEPBYSTEP
+  showResult();
+#endif
 
+  end_time = Util::microtime();
+
+  if (_curr_node->isEnd()) {
+    std::cout << "[AStar Info] Reached the end node!!";
+    std::cout << " Path cost:" << _curr_node->get_total_cost();
+  } else {
+    std::cout << "[AStar Info] No Where!!";
+  }
+  std::cout << " time:" << (end_time - start_time) << std::endl;
+  return _curr_node->isEnd();
+}
 void Model::setStartNode(const Coordinate& coord)
 {
   _start_node = setNode(coord, NodeType::kStart);
@@ -185,8 +194,20 @@ void Model::updateEstCost(Node* node)
 
 void Model::updateParentByCurr(Node* node)
 {
-  node->set_known_cost(_curr_node->get_known_cost() + 1);
+  node->set_known_cost(_curr_node->get_known_cost() + getCurrWalkingCost(node));
   node->set_parent_node(_curr_node);
+}
+
+double Model::getCurrWalkingCost(Node* node)
+{
+  Coordinate& node_coord = node->get_coord();
+  Coordinate& curr_coord = _curr_node->get_coord();
+  double walking_cost = 1;
+  if (node_coord.get_x() != curr_coord.get_x()
+      && node_coord.get_y() != curr_coord.get_y()) {
+    walking_cost = 1.414;
+  }
+  return walking_cost;
 }
 
 void Model::addNodeToOpenList(Node* node)
@@ -211,7 +232,7 @@ void Model::addNeighborNodesToOpenList()
       continue;
     }
     if (neighbor_node->isOpen()) {
-      if (isCurrBetterThan(neighbor_node->get_parent_node())) {
+      if (isCurrBetterParent(neighbor_node)) {
         updateParentByCurr(neighbor_node);
       }
     } else {
@@ -230,25 +251,27 @@ void Model::getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list)
 
   for (int x = curr_coord_x - 1; x <= curr_coord_x + 1; x++) {
     for (int y = curr_coord_y - 1; y <= curr_coord_y + 1; y++) {
-      if (x == curr_coord_x && y == curr_coord_y) {
-        continue;
-      }
-      if (isLegalCoord(x, y)) {
+      if (isLegalNeighbor(x, y)) {
         neighbor_node_list.push_back(&_grid_map[x][y]);
       }
     }
   }
 }
 
-bool Model::isLegalCoord(size_t x, size_t y)
+bool Model::isLegalNeighbor(int x, int y)
 {
-  return (0 <= x && x < _grid_map.get_x_grid_num())
-         && (0 <= y && y < _grid_map.get_y_grid_num());
+  Coordinate& curr_coord = _curr_node->get_coord();
+  if (x == curr_coord.get_x() && y == curr_coord.get_y()) {
+    return false;
+  }
+  return (0 <= x && x < (int) _grid_map.get_x_grid_num())
+         && (0 <= y && y < (int) _grid_map.get_y_grid_num());
 }
 
-bool Model::isCurrBetterThan(Node* node)
+bool Model::isCurrBetterParent(Node* node)
 {
-  return _curr_node->get_total_cost() < node->get_total_cost();
+  return (_curr_node->get_known_cost() + getCurrWalkingCost(node))
+         < node->get_known_cost();
 }
 
 void Model::freeModel()

@@ -7,7 +7,7 @@
 #ifndef ASTAR_INCLUDE_MODEL_H_
 #define ASTAR_INCLUDE_MODEL_H_
 
-#define SHOWSTEPBYSTEP 1
+#define SHOWSTEPBYSTEP 0
 
 #include <assert.h>
 
@@ -30,20 +30,21 @@ class Model
   void setMapSize(int x_grid_num, int y_grid_num);
   Node* setNode(const Coordinate& coord, const NodeType& node_type);
   void setObstacle(const std::vector<Coordinate>& obs_coord_list);
-  void findPath(const Coordinate& start_coord, const Coordinate& end_coord);
+  bool findPath(const Coordinate& start_coord, const Coordinate& end_coord);
   void setStartNode(const Coordinate& coord);
   void setEndNode(const Coordinate& coord);
   void initStartNode();
   void updateEstCost(Node* node);
   void updateParentByCurr(Node* node);
+  double getCurrWalkingCost(Node* node);
   void addNodeToOpenList(Node* node);
   void getMinCostNodeInOpenList();
   bool reachEndNode();
   bool isNoWhere();
   void addNeighborNodesToOpenList();
   void getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list);
-  bool isLegalCoord(size_t x, size_t y);
-  bool isCurrBetterThan(Node* node);
+  bool isLegalNeighbor(int x, int y);
+  bool isCurrBetterParent(Node* node);
   void showResult();
   void setOnPath(const bool on_path);
   void printGridMap();
