@@ -16,7 +16,7 @@ cd AStar
 mkdir build && cd build
 cmake ..
 make -j64
-../bin/simple_astar
+../bin/test_astar
 ```
 
 
