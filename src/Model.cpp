@@ -182,7 +182,7 @@ double caculateEstCost(Node* a, Node* b)
 #if DIAGONAL
   return std::abs(length - width) + (length < width ? length : width) * 1.414;
 #else
-  return length - width;
+  return length + width;
 #endif
 }
 
