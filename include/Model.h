@@ -8,6 +8,8 @@
 #define ASTAR_INCLUDE_MODEL_H_
 
 #define SHOWSTEPBYSTEP 0
+#define SHOWRESULT 1
+#define DIAGONAL 0
 
 #include <assert.h>
 
@@ -20,7 +22,6 @@
 #include "GridMap.h"
 #include "Node.h"
 namespace astar {
-
 class Model
 {
  public:

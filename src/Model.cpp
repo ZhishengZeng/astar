@@ -122,9 +122,6 @@ void Model::printGridMap()
 
 bool Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
 {
-  double start_time, end_time;
-  start_time = Util::microtime();
-
   setStartNode(start_coord);
   setEndNode(end_coord);
   initStartNode();
@@ -148,11 +145,9 @@ bool Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
     }
   }
 
-#if !SHOWSTEPBYSTEP
+#if SHOWRESULT
   showResult();
 #endif
-
-  end_time = Util::microtime();
 
   if (_curr_node->isEnd()) {
     std::cout << "[AStar Info] Reached the end node!!";
@@ -160,7 +155,6 @@ bool Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
   } else {
     std::cout << "[AStar Info] No Where!!";
   }
-  std::cout << " time:" << (end_time - start_time) << std::endl;
   return _curr_node->isEnd();
 }
 void Model::setStartNode(const Coordinate& coord)
@@ -181,10 +175,15 @@ void Model::initStartNode()
   addNodeToOpenList(_start_node);
 }
 
-int caculateEstCost(Node* a, Node* b)
+double caculateEstCost(Node* a, Node* b)
 {
-  return std::abs(a->get_coord().get_x() - b->get_coord().get_x())
-         + std::abs(a->get_coord().get_y() - b->get_coord().get_y());
+  int length = std::abs(a->get_coord().get_x() - b->get_coord().get_x());
+  int width = std::abs(a->get_coord().get_y() - b->get_coord().get_y());
+#if DIAGONAL
+  return std::abs(length - width) + (length < width ? length : width) * 1.414;
+#else
+  return length - width;
+#endif
 }
 
 void Model::updateEstCost(Node* node)
@@ -249,12 +248,20 @@ void Model::getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list)
   int curr_coord_x = curr_coord.get_x();
   int curr_coord_y = curr_coord.get_y();
 
-  for (int x = curr_coord_x - 1; x <= curr_coord_x + 1; x++) {
-    for (int y = curr_coord_y - 1; y <= curr_coord_y + 1; y++) {
-      if (isLegalNeighbor(x, y)) {
-        neighbor_node_list.push_back(&_grid_map[x][y]);
-      }
+  std::vector<Coordinate> offset_list;
+#if DIAGONAL
+  offset_list = {{-1, -1}, {-1, 0}, {0, -1}, {1, 0}, {0, 1}, {1, 1}};
+#else
+  offset_list = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+#endif
+
+  for (size_t i = 0; i < offset_list.size(); i++) {
+    int x = curr_coord_x + offset_list[i].get_x();
+    int y = curr_coord_y + offset_list[i].get_y();
+    if (!isLegalNeighbor(x, y)) {
+      continue;
     }
+    neighbor_node_list.push_back(&_grid_map[x][y]);
   }
 }
 
