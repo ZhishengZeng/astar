@@ -20,8 +20,8 @@
 #include "Node.h"
 
 #define SHOWSTEPBYSTEP 0
-#define SHOWRESULT 0
-#define DIAGONAL 1
+#define SHOWRESULT 1
+#define DIAGONAL 0
 
 namespace astar {
 class Model
