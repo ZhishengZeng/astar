@@ -6,14 +6,13 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 include_directories(
-${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/include
 ${PROJECT_SOURCE_DIR}/util
 ${PROJECT_SOURCE_DIR}/third_party/googletest
 )
 
-add_library(astar 
-${PROJECT_SOURCE_DIR}/Model.cpp
+add_library(astar
+${PROJECT_SOURCE_DIR}/src/Model.cpp
 ${PROJECT_SOURCE_DIR}/util/Util.cpp
 )
 
