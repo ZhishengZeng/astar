@@ -30,7 +30,7 @@ Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
          && coord.get_y() < (int) _grid_map.get_y_grid_num());
 
   Node& node = _grid_map[coord.get_x()][coord.get_y()];
-  if (node.get_type() == NodeType::kNone) {
+  if (node.get_type() == NodeType::kNone || node.get_type() == NodeType::kObs) {
     node.set_type(node_type);
     return &node;
   } else {
