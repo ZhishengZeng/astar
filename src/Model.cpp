@@ -192,6 +192,7 @@ std::vector<Coordinate> Model::getPathCoord()
     return path_coord;
   }
 
+  path_coord.push_back(_end_node->get_coord());
   Direction curr_direction
       = getDirection(_curr_node, _curr_node->get_parent_node());
 
@@ -205,6 +206,8 @@ std::vector<Coordinate> Model::getPathCoord()
     temp_node = temp_node->get_parent_node();
 
   } while (!temp_node->isStart());
+
+  path_coord.push_back(_start_node->get_coord());
 
   for (size_t i = 0, j = (path_coord.size() - 1); i < j; i++, j--) {
     std::swap(path_coord[i], path_coord[j]);
