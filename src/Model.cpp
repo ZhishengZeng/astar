@@ -343,12 +343,6 @@ void Model::freeModel()
   _start_node = nullptr;
   _end_node = nullptr;
   _curr_node = nullptr;
-
-  while (!_open_list.empty()) {
-    Node* a = _open_list.top();
-    _open_list.pop();
-    a = nullptr;
-  }
 }
 
 }  // namespace astar
