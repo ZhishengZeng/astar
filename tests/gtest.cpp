@@ -19,7 +19,7 @@ TEST(RoutingTest, Reached)
                            {6, 3},
                            {7, 2},
                            {7, 3}});
-  EXPECT_TRUE(astar_model.findPath({0, 3}, {7, 0}));
+  EXPECT_TRUE(astar_model.findPath({0, 3}, {7, 0}).size());
 }
 
 TEST(RoutingTest, NoWhere)
@@ -40,7 +40,7 @@ TEST(RoutingTest, NoWhere)
                            {6, 3},
                            {7, 2},
                            {7, 3}});
-  EXPECT_FALSE(astar_model.findPath({0, 3}, {7, 0}));
+  EXPECT_FALSE(astar_model.findPath({0, 3}, {7, 0}).size());
 }
 
 }  // namespace

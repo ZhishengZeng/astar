@@ -16,8 +16,8 @@ int main()
   double start_time, end_time;
   start_time = astar::Util::microtime();
 
-  int x_grid_num = 15;
-  int y_grid_num = 15;
+  int x_grid_num = 5000;
+  int y_grid_num = 5000;
   srand((unsigned) time(NULL));
   std::set<astar::Coordinate, astar::cmpCoordinate> coord_set;
   while ((int) coord_set.size() < (x_grid_num * y_grid_num / 4)) {

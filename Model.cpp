@@ -60,11 +60,10 @@ void Model::setOnPath(const bool on_path)
     return;
   }
   Node* temp_node = _curr_node;
-  while (temp_node->get_coord() != _start_node->get_coord()) {
+  do {
     temp_node->set_on_path(on_path);
     temp_node = temp_node->get_parent_node();
-  }
-  _start_node->set_on_path(on_path);
+  } while (!temp_node->isStart());
 }
 
 void printNode(Node& node)
@@ -120,8 +119,11 @@ void Model::printGridMap()
   std::cout << "--------------------------------------------------\n";
 }
 
-bool Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
+std::vector<Coordinate> Model::findPath(const Coordinate& start_coord,
+                                        const Coordinate& end_coord)
 {
+  std::vector<Coordinate> path_coord;
+
   setStartNode(start_coord);
   setEndNode(end_coord);
   initStartNode();
@@ -144,10 +146,10 @@ bool Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
       break;
     }
   }
-
 #if SHOWRESULT
   showResult();
 #endif
+  path_coord = getPathCoord();
 
   if (_curr_node->isEnd()) {
     std::cout << "[AStar Info] Reached the end node!!";
@@ -155,8 +157,62 @@ bool Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
   } else {
     std::cout << "[AStar Info] No Where!!";
   }
-  return _curr_node->isEnd();
+  std::cout << std::endl;
+  return path_coord;
 }
+
+bool isHorizontal(Coordinate& start_coord, Coordinate& end_coord)
+{
+  return start_coord.get_y() == end_coord.get_y();
+}
+
+bool isVertical(Coordinate& start_coord, Coordinate& end_coord)
+{
+  return start_coord.get_x() == end_coord.get_x();
+}
+
+Direction getDirection(Node* start_node, Node* end_node)
+{
+  Coordinate& start_coord = start_node->get_coord();
+  Coordinate& end_coord = end_node->get_coord();
+  if (isHorizontal(start_coord, end_coord)) {
+    return Direction::kHorizontal;
+  } else if (isVertical(start_coord, end_coord)) {
+    return Direction::kVertical;
+  } else {
+    return Direction::kDiagonal;
+  }
+}
+
+std::vector<Coordinate> Model::getPathCoord()
+{
+  std::vector<Coordinate> path_coord;
+
+  if (_curr_node == nullptr || !_curr_node->isEnd()) {
+    return path_coord;
+  }
+
+  Direction curr_direction
+      = getDirection(_curr_node, _curr_node->get_parent_node());
+
+  Node* temp_node = _curr_node;
+  do {
+    Direction direction = getDirection(temp_node, temp_node->get_parent_node());
+    if (curr_direction != direction) {
+      curr_direction = direction;
+      path_coord.push_back(temp_node->get_coord());
+    }
+    temp_node = temp_node->get_parent_node();
+
+  } while (!temp_node->isStart());
+
+  for (size_t i = 0, j = (path_coord.size() - 1); i < j; i++, j--) {
+    std::swap(path_coord[i], path_coord[j]);
+  }
+
+  return path_coord;
+}
+
 void Model::setStartNode(const Coordinate& coord)
 {
   _start_node = setNode(coord, NodeType::kStart);
@@ -250,7 +306,8 @@ void Model::getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list)
 
   std::vector<Coordinate> offset_list;
 #if DIAGONAL
-  offset_list = {{-1, -1}, {-1, 0}, {0, -1}, {1, 0}, {0, 1}, {1, 1}};
+  offset_list
+      = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {-1, 1}, {1, -1}, {-1, -1}, {1, 1}};
 #else
   offset_list = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 #endif

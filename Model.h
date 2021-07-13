@@ -7,10 +7,6 @@
 #ifndef ASTAR_INCLUDE_MODEL_H_
 #define ASTAR_INCLUDE_MODEL_H_
 
-#define SHOWSTEPBYSTEP 0
-#define SHOWRESULT 1
-#define DIAGONAL 0
-
 #include <assert.h>
 
 #include <algorithm>
@@ -19,8 +15,14 @@
 #include <queue>
 #include <vector>
 
+#include "Direction.h"
 #include "GridMap.h"
 #include "Node.h"
+
+#define SHOWSTEPBYSTEP 0
+#define SHOWRESULT 0
+#define DIAGONAL 1
+
 namespace astar {
 class Model
 {
@@ -31,7 +33,8 @@ class Model
   void setMapSize(int x_grid_num, int y_grid_num);
   Node* setNode(const Coordinate& coord, const NodeType& node_type);
   void setObstacle(const std::vector<Coordinate>& obs_coord_list);
-  bool findPath(const Coordinate& start_coord, const Coordinate& end_coord);
+  std::vector<Coordinate> findPath(const Coordinate& start_coord,
+                                   const Coordinate& end_coord);
   void setStartNode(const Coordinate& coord);
   void setEndNode(const Coordinate& coord);
   void initStartNode();
@@ -50,6 +53,7 @@ class Model
   void setOnPath(const bool on_path);
   void printGridMap();
   void freeModel();
+  std::vector<Coordinate> getPathCoord();
 
  private:
   GridMap<Node> _grid_map;
