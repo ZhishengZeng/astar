@@ -10,13 +10,13 @@
 #include "Util.h"
 namespace astar {
 
-void Model::setMapSize(int x_grid_num, int y_grid_num)
+void Model::setMapSize(int x_size, int y_size)
 {
-  assert(x_grid_num > 0 && y_grid_num > 0);
+  assert(x_size > 0 && y_size > 0);
 
-  _grid_map.init(x_grid_num, y_grid_num);
-  for (int i = 0; i < (int) _grid_map.get_x_grid_num(); i++) {
-    for (int j = 0; j < (int) _grid_map.get_y_grid_num(); j++) {
+  _grid_map.init(x_size, y_size);
+  for (int i = 0; i < (int) _grid_map.get_x_size(); i++) {
+    for (int j = 0; j < (int) _grid_map.get_y_size(); j++) {
       _grid_map[i][j].set_coord(i, j);
     }
   }
@@ -24,10 +24,8 @@ void Model::setMapSize(int x_grid_num, int y_grid_num)
 
 Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
 {
-  assert(0 <= coord.get_x()
-         && coord.get_x() < (int) _grid_map.get_x_grid_num());
-  assert(0 <= coord.get_y()
-         && coord.get_y() < (int) _grid_map.get_y_grid_num());
+  assert(0 <= coord.get_x() && coord.get_x() < (int) _grid_map.get_x_size());
+  assert(0 <= coord.get_y() && coord.get_y() < (int) _grid_map.get_y_size());
 
   Node& node = _grid_map[coord.get_x()][coord.get_y()];
   if (node.get_type() == NodeType::kNone || node.get_type() == NodeType::kObs) {
@@ -110,8 +108,8 @@ void printNode(Node& node)
 void Model::printGridMap()
 {
   std::cout << "--------------------------------------------------\n";
-  for (int j = _grid_map.get_y_grid_num() - 1; j >= 0; j--) {
-    for (int i = 0; i < (int) _grid_map.get_x_grid_num(); i++) {
+  for (int j = _grid_map.get_y_size() - 1; j >= 0; j--) {
+    for (int i = 0; i < (int) _grid_map.get_x_size(); i++) {
       printNode(_grid_map[i][j]);
     }
     std::cout << "\n";
@@ -147,7 +145,11 @@ std::vector<Coordinate> Model::findPath(const Coordinate& start_coord,
     }
   }
 #if SHOWRESULT
-  showResult();
+  if (_grid_map.get_x_size() > 50 || _grid_map.get_y_size() > 50) {
+    std::cout << "[AStar Warning] Large map , skipping..." << std::endl;
+  } else {
+    showResult();
+  }
 #endif
   path_coord = getPathCoord();
 
@@ -331,8 +333,8 @@ bool Model::isLegalNeighbor(int x, int y)
   if (x == curr_coord.get_x() && y == curr_coord.get_y()) {
     return false;
   }
-  return (0 <= x && x < (int) _grid_map.get_x_grid_num())
-         && (0 <= y && y < (int) _grid_map.get_y_grid_num());
+  return (0 <= x && x < (int) _grid_map.get_x_size())
+         && (0 <= y && y < (int) _grid_map.get_y_size());
 }
 
 bool Model::isCurrBetterParent(Node* node)

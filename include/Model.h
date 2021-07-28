@@ -30,7 +30,7 @@ class Model
   Model() {}
   ~Model() { freeModel(); }
 
-  void setMapSize(int x_grid_num, int y_grid_num);
+  void setMapSize(int x_size, int y_size);
   Node* setNode(const Coordinate& coord, const NodeType& node_type);
   void setObstacle(const std::vector<Coordinate>& obs_coord_list);
   std::vector<Coordinate> findPath(const Coordinate& start_coord,

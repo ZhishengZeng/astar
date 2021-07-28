@@ -1,4 +1,4 @@
-// Copyright 2021 Author ChibiMarukoZ
+// Copyright 2021 Author ZengZhisheng
 #ifndef ASTAR_INCLUDE_DIRECTION_H_
 #define ASTAR_INCLUDE_DIRECTION_H_
 namespace astar {
