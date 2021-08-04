@@ -4,6 +4,7 @@
  * @Description:
  * @FilePath: /AStar/include/Node.h
  */
+
 #ifndef ASTAR_INCLUDE_NODE_H_
 #define ASTAR_INCLUDE_NODE_H_
 
@@ -69,7 +70,7 @@ class Node
   bool _on_path = false;
 };
 
-struct cmpNode
+struct cmpNodeCost
 {
   bool operator()(Node* a, Node* b)
   {

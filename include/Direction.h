@@ -1,4 +1,10 @@
-// Copyright 2021 Author ZengZhisheng
+/*
+ * @Author: ZengZhisheng
+ * @Date: 2021-08-04 13:00:49
+ * @Description:
+ * @FilePath: /AStar/include/Direction.h
+ */
+
 #ifndef ASTAR_INCLUDE_DIRECTION_H_
 #define ASTAR_INCLUDE_DIRECTION_H_
 namespace astar {

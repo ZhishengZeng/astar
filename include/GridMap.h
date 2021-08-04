@@ -13,11 +13,6 @@ namespace astar {
 template <typename T>
 class GridMap
 {
- private:
-  size_t _x_size = 0;
-  size_t _y_size = 0;
-  T** _array = nullptr;
-
  public:
   GridMap() {}
   GridMap(const GridMap& other)
@@ -61,6 +56,11 @@ class GridMap
   T** cloneArray(T** other_array, size_t x_size, size_t y_size);
   void freeArray(T** array);
   bool isEmpty();
+
+ private:
+  size_t _x_size = 0;
+  size_t _y_size = 0;
+  T** _array = nullptr;
 };
 
 template <typename T>

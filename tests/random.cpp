@@ -30,7 +30,8 @@ int main()
   }
 
   end_time = astar::Util::microtime();
-  std::cout << " time:" << (end_time - start_time) << std::endl;
+  std::cout << "[AStar Info] Create example time:" << (end_time - start_time)
+            << std::endl;
   start_time = end_time;
 
   astar::Model astar_model;
@@ -39,6 +40,6 @@ int main()
   astar_model.findPath(coord_list.front(), coord_list.back());
 
   end_time = astar::Util::microtime();
-  std::cout << " time:" << (end_time - start_time) << std::endl;
+  std::cout << "[AStar Info] Run time:" << (end_time - start_time) << std::endl;
   return 0;
 }

@@ -4,6 +4,7 @@
  * @Description:
  * @FilePath: /AStarextension-output-#3
  */
+
 #ifndef ASTAR_INCLUDE_MODEL_H_
 #define ASTAR_INCLUDE_MODEL_H_
 
@@ -51,13 +52,14 @@ class Model
   bool isCurrBetterParent(Node* node);
   void showResult();
   void setOnPath(const bool on_path);
+  void reportResult();
   void printGridMap();
   void freeModel();
   std::vector<Coordinate> getPathCoord();
 
  private:
   GridMap<Node> _grid_map;
-  std::priority_queue<Node*, std::vector<Node*>, cmpNode> _open_list;
+  std::priority_queue<Node*, std::vector<Node*>, cmpNodeCost> _open_list;
   Node* _start_node = nullptr;
   Node* _end_node = nullptr;
   Node* _curr_node = nullptr;

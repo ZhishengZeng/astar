@@ -47,6 +47,12 @@ void Model::setObstacle(const std::vector<Coordinate>& obs_coord_list)
 
 void Model::showResult()
 {
+  if (_grid_map.get_x_size() > 50 || _grid_map.get_y_size() > 50) {
+    std::cout
+        << "[AStar Warning] Plot large map(larger than 50x50) , skipping..."
+        << std::endl;
+    return;
+  }
   setOnPath(true);
   printGridMap();
   setOnPath(false);
@@ -86,8 +92,8 @@ void printNode(Node& node)
           }
           break;
         default:
-          std::cout << "default???";
-          break;
+          std::cout << "[AStar Error] Node type not recognized!" << std::endl;
+          exit(1);
       }
       break;
     case NodeType::kObs:
@@ -100,8 +106,8 @@ void printNode(Node& node)
       printf("\33[44m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
       break;
     default:
-      std::cout << "default???";
-      break;
+      std::cout << "[AStar Error] Node type not recognized!" << std::endl;
+      exit(1);
   }
 }
 
@@ -145,22 +151,10 @@ std::vector<Coordinate> Model::findPath(const Coordinate& start_coord,
     }
   }
 #if SHOWRESULT
-  if (_grid_map.get_x_size() > 50 || _grid_map.get_y_size() > 50) {
-    std::cout << "[AStar Warning] Large map , skipping..." << std::endl;
-  } else {
-    showResult();
-  }
+  showResult();
 #endif
-  path_coord = getPathCoord();
-
-  if (_curr_node->isEnd()) {
-    std::cout << "[AStar Info] Reached the end node!!";
-    std::cout << " Path cost:" << _curr_node->get_total_cost();
-  } else {
-    std::cout << "[AStar Info] No Where!!";
-  }
-  std::cout << std::endl;
-  return path_coord;
+  reportResult();
+  return getPathCoord();
 }
 
 bool isHorizontal(Coordinate& start_coord, Coordinate& end_coord)
@@ -216,6 +210,17 @@ std::vector<Coordinate> Model::getPathCoord()
   }
 
   return path_coord;
+}
+
+void Model::reportResult()
+{
+  if (_curr_node->isEnd()) {
+    std::cout << "[AStar Info] Reached the end node!! Path cost:"
+              << _curr_node->get_total_cost();
+  } else {
+    std::cout << "[AStar Info] No Where!!";
+  }
+  std::cout << std::endl;
 }
 
 void Model::setStartNode(const Coordinate& coord)
