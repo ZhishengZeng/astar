@@ -34,10 +34,13 @@ int main()
             << std::endl;
   start_time = end_time;
 
-  astar::Model astar_model;
-  astar_model.setMapSize(x_size, y_size);
-  astar_model.setObstacle(obs_coord_list);
-  astar_model.findPath(coord_list.front(), coord_list.back());
+  int a = 100;
+  while (a--) {
+    astar::Model astar_model;
+    astar_model.setMapSize(x_size, y_size);
+    astar_model.setObstacle(obs_coord_list);
+    astar_model.findPath(coord_list.front(), coord_list.back());
+  }
 
   end_time = astar::Util::microtime();
   std::cout << "[AStar Info] Run time:" << (end_time - start_time) << std::endl;

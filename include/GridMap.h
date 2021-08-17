@@ -97,7 +97,12 @@ inline T** GridMap<T>::cloneArray(T** other_array, size_t x_size, size_t y_size)
 template <typename T>
 inline void GridMap<T>::freeArray(T** array)
 {
-  delete[] array;
+  delete[] array[0];
+  array[0] = nullptr;
+  for (size_t i = 1; i < _x_size; i++) {
+    array[i] = nullptr;
+  }
+  delete array;
   array = nullptr;
 }
 
