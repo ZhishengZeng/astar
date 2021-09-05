@@ -16,10 +16,10 @@ ${PROJECT_SOURCE_DIR}/src/Util.cpp
 )
 
 
-# SET(CMAKE_BUILD_TYPE "Release")
-# SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
-SET(CMAKE_BUILD_TYPE "Debug")
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb -fsanitize=address")
+SET(CMAKE_BUILD_TYPE "Release")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+# SET(CMAKE_BUILD_TYPE "Debug")
+# SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb -fsanitize=address")
 
 add_executable(simple_astar ${PROJECT_SOURCE_DIR}/tests/simple.cpp)
 add_executable(random_astar ${PROJECT_SOURCE_DIR}/tests/random.cpp)

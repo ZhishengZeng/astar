@@ -218,7 +218,7 @@ void Model::reportResult()
     std::cout << "[AStar Info] Reached the end node!! Path cost:"
               << _curr_node->get_total_cost();
   } else {
-    std::cout << "[AStar Info] No Where!!";
+    std::cout << "[AStar Info] Can't reach the end node!!";
   }
   std::cout << std::endl;
 }
