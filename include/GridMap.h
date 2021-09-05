@@ -31,6 +31,7 @@ class GridMap
   ~GridMap() { freeArray(_array); }
   GridMap& operator=(const GridMap& other)
   {
+    freeArray(_array);
     _x_size = other._x_size;
     _y_size = other._y_size;
     _array = cloneArray(other._array, other._x_size, other._y_size);
@@ -38,6 +39,7 @@ class GridMap
   }
   GridMap& operator=(GridMap&& other)
   {
+    freeArray(_array);
     _x_size = other._x_size;
     _y_size = other._y_size;
     _array = other._array;
@@ -74,6 +76,9 @@ inline void GridMap<T>::init(size_t x_size, size_t y_size)
 template <typename T>
 inline T** GridMap<T>::initArray(size_t x_size, size_t y_size)
 {
+  if (x_size == 0 || y_size == 0) {
+    return nullptr;
+  }
   T** array = new T*[x_size];
   array[0] = new T[x_size * y_size];
   for (size_t i = 1; i < x_size; i++) {
@@ -97,12 +102,10 @@ inline T** GridMap<T>::cloneArray(T** other_array, size_t x_size, size_t y_size)
 template <typename T>
 inline void GridMap<T>::freeArray(T** array)
 {
-  delete[] array[0];
-  array[0] = nullptr;
-  for (size_t i = 1; i < _x_size; i++) {
-    array[i] = nullptr;
+  if (array) {
+    delete[] array[0];
   }
-  delete array;
+  delete[] array;
   array = nullptr;
 }
 
@@ -111,7 +114,6 @@ inline bool GridMap<T>::isEmpty()
 {
   return _x_size == 0 || _y_size == 0;
 }
-
 }  // namespace astar
 
 #endif  // ASTAR_INCLUDE_MAT_H_
