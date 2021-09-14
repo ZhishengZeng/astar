@@ -7,7 +7,9 @@
 
 #ifndef ASTAR_INCLUDE_MAT_H_
 #define ASTAR_INCLUDE_MAT_H_
-#include "malloc.h"
+#include <malloc.h>
+
+#include <cassert>
 namespace astar {
 
 template <typename T>
