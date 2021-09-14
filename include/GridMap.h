@@ -46,7 +46,11 @@ class GridMap
     other._array = nullptr;
     return (*this);
   }
-  T* operator[](const size_t i) { return _array[i]; }
+  T* operator[](const size_t i)
+  {
+    assert(0 <= i && i < _x_size);
+    return _array[i];
+  }
   // getter
   size_t get_x_size() const { return _x_size; }
   size_t get_y_size() const { return _y_size; }
