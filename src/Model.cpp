@@ -132,18 +132,13 @@ std::vector<Coordinate> Model::findPath(const Coordinate& start_coord,
   setEndNode(end_coord);
   initStartNode();
   while (true) {
-#if SHOWSTEPBYSTEP
-    showResult();
-#endif
-    // 搜索最小代价点
+    // 获取当前最优结果点
     getMinCostNodeInOpenList();
-#if SHOWSTEPBYSTEP
-    showResult();
-#endif
-    // 是否抵达终点
+    // 判断是否抵达终点
     if (_curr_node->isEnd()) {
       break;
     }
+    // 搜寻备选下一步节点
     addNeighborNodesToOpenList();
     // 无路可走
     if (_open_list.empty()) {

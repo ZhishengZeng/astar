@@ -20,7 +20,6 @@
 #include "GridMap.h"
 #include "Node.h"
 
-#define SHOWSTEPBYSTEP 0
 #define SHOWRESULT 0
 #define DIAGONAL 0
 
