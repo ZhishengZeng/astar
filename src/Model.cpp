@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 17:10:04
+ * @LastEditTime: 2021-09-15 19:51:01
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -23,13 +23,74 @@ void Model::buildMap(int x_size, int y_size)
   }
 }
 
-void Model::addNodeCost(const std::vector<std::pair<Coordinate, double>>& coord_cost_list)
+void Model::addNodeCost(const std::pair<Coordinate, double>& coord_cost)
+{
+  _coord_cost_list.push_back(coord_cost);
+}
+
+void Model::addObstacle(const Coordinate& obs_coord)
+{
+  _obs_coord_list.push_back(obs_coord);
+}
+
+void Model::enableDiagonalRouting()
+{
+  _routing_diagonal = true;
+}
+
+void Model::disableDiagonalRouting()
+{
+  _routing_diagonal = false;
+}
+
+void Model::enableTurningBack()
+{
+  _turning_back = true;
+}
+
+void Model::disableTurningBack()
+{
+  _turning_back = false;
+}
+
+std::vector<Coordinate> Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
+{
+  std::vector<Coordinate> path_coord;
+
+  addCostToMap();
+  addObsToMap();
+  setStartNode(start_coord);
+  setEndNode(end_coord);
+  initStartNode();
+  initOffsetList();
+  while (true) {
+    // 获取当前最优结果点
+    getMinCostNodeInOpenList();
+    // 判断是否抵达终点
+    if (_curr_node->isEnd()) {
+      break;
+    }
+    // 搜寻备选下一步节点
+    addNeighborNodesToOpenList();
+    // 无路可走
+    if (_open_list.empty()) {
+      break;
+    }
+  }
+#if SHOWRESULT
+  showResult();
+#endif
+  reportResult();
+  return getPathCoord();
+}
+
+void Model::addCostToMap()
 {
   std::map<Coordinate, double, cmpCoordinate> coord_cost_map;
   std::map<Coordinate, double>::iterator iter;
-  for (size_t i = 0; i < coord_cost_list.size(); i++) {
-    const Coordinate& coord = coord_cost_list[i].first;
-    double cost = coord_cost_list[i].second;
+  for (size_t i = 0; i < _coord_cost_list.size(); i++) {
+    const Coordinate& coord = _coord_cost_list[i].first;
+    double cost = _coord_cost_list[i].second;
 
     iter = coord_cost_map.find(coord);
     if (iter != coord_cost_map.end()) {
@@ -67,10 +128,10 @@ void Model::addNodeCost(const std::vector<std::pair<Coordinate, double>>& coord_
   }
 }
 
-void Model::addObstacle(const std::vector<Coordinate>& obs_coord_list)
+void Model::addObsToMap()
 {
-  for (size_t i = 0; i < obs_coord_list.size(); i++) {
-    setNode(obs_coord_list[i], NodeType::kObs);
+  for (size_t i = 0; i < _obs_coord_list.size(); i++) {
+    setNode(_obs_coord_list[i], NodeType::kObs);
   }
 }
 
@@ -88,55 +149,6 @@ Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
               << "] type is not null!!" << std::endl;
     exit(1);
   }
-}
-
-void Model::enableDiagonalRouting()
-{
-  _routing_diagonal = true;
-}
-
-void Model::disableDiagonalRouting()
-{
-  _routing_diagonal = false;
-}
-
-void Model::enableTurningBack()
-{
-  _turning_back = true;
-}
-
-void Model::disableTurningBack()
-{
-  _turning_back = false;
-}
-
-std::vector<Coordinate> Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
-{
-  std::vector<Coordinate> path_coord;
-
-  setStartNode(start_coord);
-  setEndNode(end_coord);
-  initStartNode();
-  initOffsetList();
-  while (true) {
-    // 获取当前最优结果点
-    getMinCostNodeInOpenList();
-    // 判断是否抵达终点
-    if (_curr_node->isEnd()) {
-      break;
-    }
-    // 搜寻备选下一步节点
-    addNeighborNodesToOpenList();
-    // 无路可走
-    if (_open_list.empty()) {
-      break;
-    }
-  }
-#if SHOWRESULT
-  showResult();
-#endif
-  reportResult();
-  return getPathCoord();
 }
 
 void Model::setStartNode(const Coordinate& coord)

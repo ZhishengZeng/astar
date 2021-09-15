@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 14:10:42
+ * @LastEditTime: 2021-09-15 19:53:26
  * @FilePath: /AStar/tests/random.cpp
  */
 
@@ -27,10 +27,6 @@ int main()
     coord_set.insert({rand() % x_size, rand() % y_size});
   }
   std::vector<astar::Coordinate> coord_list(coord_set.begin(), coord_set.end());
-  std::vector<astar::Coordinate> obs_coord_list;
-  for (size_t i = 1; i < coord_list.size() - 1; i++) {
-    obs_coord_list.push_back(coord_list[i]);
-  }
 
   end_time = astar::Util::microtime();
   std::cout << "[AStar Info] Create example time:" << (end_time - start_time)
@@ -39,7 +35,11 @@ int main()
 
   astar::Model astar_model;
   astar_model.buildMap(x_size, y_size);
-  astar_model.addObstacle(obs_coord_list);
+
+  std::vector<astar::Coordinate> obs_coord_list;
+  for (size_t i = 1; i < coord_list.size() - 1; i++) {
+    astar_model.addObstacle(coord_list[i]);
+  }
   astar_model.findPath(coord_list.front(), coord_list.back());
 
   end_time = astar::Util::microtime();

@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 17:10:33
+ * @LastEditTime: 2021-09-15 19:50:17
  * @FilePath: /AStar/include/Model.h
  */
 
@@ -39,14 +39,16 @@ class Model
   }
 
   void buildMap(int x_size, int y_size);
-  void addNodeCost(const std::vector<std::pair<Coordinate, double>>& coord_cost_list);
-  void addObstacle(const std::vector<Coordinate>& obs_coord_list);
-  Node* setNode(const Coordinate& coord, const NodeType& node_type);
+  void addNodeCost(const std::pair<Coordinate, double>& coord_cost);
+  void addObstacle(const Coordinate& obs_coord);
   void enableDiagonalRouting();
   void disableDiagonalRouting();
   void enableTurningBack();
   void disableTurningBack();
   std::vector<Coordinate> findPath(const Coordinate& start_coord, const Coordinate& end_coord);
+  void addCostToMap();
+  void addObsToMap();
+  Node* setNode(const Coordinate& coord, const NodeType& node_type);
   void setStartNode(const Coordinate& coord);
   void setEndNode(const Coordinate& coord);
   void initStartNode();
@@ -72,17 +74,16 @@ class Model
   bool isVertical(Coordinate& start_coord, Coordinate& end_coord);
 
  private:
-  // base
+  // input
   GridMap<Node> _grid_map;
+  std::vector<std::pair<Coordinate, double>> _coord_cost_list;
+  std::vector<Coordinate> _obs_coord_list;
+  bool _turning_back = true;
+  bool _routing_diagonal = false;
   Node* _start_node = nullptr;
   Node* _end_node = nullptr;
   Node* _curr_node = nullptr;
-  GridMap<double> _weight_map;
   double _min_node_cost = 0;
-  // config
-  bool _turning_back = true;
-  bool _routing_diagonal = false;
-  // object
   std::vector<Coordinate> _offset_list;
   std::priority_queue<Node*, std::vector<Node*>, cmpNodeCost> _open_list;
 };
