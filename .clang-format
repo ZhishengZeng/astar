@@ -2,7 +2,7 @@
 Language:        Cpp
 BasedOnStyle:  Google
 
-ColumnLimit: 80
+ColumnLimit: 120
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AllowAllParametersOfDeclarationOnNextLine: false

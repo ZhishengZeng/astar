@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 14:22:42
+ * @LastEditTime: 2021-09-15 17:10:04
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -11,7 +11,7 @@
 #include "Util.h"
 namespace astar {
 
-void Model::setMapSize(int x_size, int y_size)
+void Model::buildMap(int x_size, int y_size)
 {
   assert(x_size > 0 && y_size > 0);
 
@@ -23,7 +23,51 @@ void Model::setMapSize(int x_size, int y_size)
   }
 }
 
-void Model::setObstacle(const std::vector<Coordinate>& obs_coord_list)
+void Model::addNodeCost(const std::vector<std::pair<Coordinate, double>>& coord_cost_list)
+{
+  std::map<Coordinate, double, cmpCoordinate> coord_cost_map;
+  std::map<Coordinate, double>::iterator iter;
+  for (size_t i = 0; i < coord_cost_list.size(); i++) {
+    const Coordinate& coord = coord_cost_list[i].first;
+    double cost = coord_cost_list[i].second;
+
+    iter = coord_cost_map.find(coord);
+    if (iter != coord_cost_map.end()) {
+      coord_cost_map[coord] += cost;
+    } else {
+      coord_cost_map.insert(std::map<Coordinate, double>::value_type(coord, cost));
+    }
+  }
+
+  for (size_t x = 0; x < _grid_map.get_x_size(); x++) {
+    for (size_t y = 0; y < _grid_map.get_y_size(); y++) {
+      Coordinate coord(x, y);
+      if (coord_cost_map.find(coord) == coord_cost_map.end()) {
+        coord_cost_map.insert(std::map<Coordinate, double>::value_type(coord, 0));
+      }
+    }
+  }
+
+  std::vector<double> cost_list;
+  for (iter = coord_cost_map.begin(); iter != coord_cost_map.end(); iter++) {
+    cost_list.push_back(iter->second);
+  }
+
+  std::sort(cost_list.begin(), cost_list.end());
+
+  // Method 1
+  _min_node_cost = cost_list.front();
+  // Method 2
+
+  // Method 3
+
+  for (iter = coord_cost_map.begin(); iter != coord_cost_map.end(); iter++) {
+    const Coordinate& coord = iter->first;
+    _grid_map[coord.get_x()][coord.get_y()].set_self_cost(iter->second);
+  }
+}
+
+void Model::addObstacle(const std::vector<Coordinate>& obs_coord_list)
 {
   for (size_t i = 0; i < obs_coord_list.size(); i++) {
     setNode(obs_coord_list[i], NodeType::kObs);
@@ -46,14 +90,27 @@ Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
   }
 }
 
-void Model::setRoutingMode(bool routing_diagonal, bool turning_back)
+void Model::enableDiagonalRouting()
 {
-  _routing_diagonal = routing_diagonal;
-  _turning_back = turning_back;
+  _routing_diagonal = true;
 }
 
-std::vector<Coordinate> Model::findPath(const Coordinate& start_coord,
-                                        const Coordinate& end_coord)
+void Model::disableDiagonalRouting()
+{
+  _routing_diagonal = false;
+}
+
+void Model::enableTurningBack()
+{
+  _turning_back = true;
+}
+
+void Model::disableTurningBack()
+{
+  _turning_back = false;
+}
+
+std::vector<Coordinate> Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
 {
   std::vector<Coordinate> path_coord;
 
@@ -107,13 +164,15 @@ void Model::updateEstCost(Node* node)
 
 double Model::caculateEstCost(Node* a, Node* b)
 {
+  int wire_length = 0;
   int length = std::abs(a->get_coord().get_x() - b->get_coord().get_x());
   int width = std::abs(a->get_coord().get_y() - b->get_coord().get_y());
   if (_routing_diagonal) {
-    return std::abs(length - width) + (length < width ? length : width) * 1.414;
+    wire_length = (std::abs(length - width) + (length < width ? length : width) * 1.414);
   } else {
-    return length + width;
+    wire_length = (length + width);
   }
+  return (wire_length + wire_length * _min_node_cost);
 }
 
 void Model::updateParentByCurr(Node* node)
@@ -131,6 +190,7 @@ double Model::getCurrWalkingCost(Node* node)
       && node_coord.get_y() != curr_coord.get_y()) {
     walking_cost = 1.414;
   }
+  walking_cost += node->get_self_cost();
   return walking_cost;
 }
 

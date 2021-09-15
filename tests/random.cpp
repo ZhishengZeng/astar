@@ -38,8 +38,8 @@ int main()
   start_time = end_time;
 
   astar::Model astar_model;
-  astar_model.setMapSize(x_size, y_size);
-  astar_model.setObstacle(obs_coord_list);
+  astar_model.buildMap(x_size, y_size);
+  astar_model.addObstacle(obs_coord_list);
   astar_model.findPath(coord_list.front(), coord_list.back());
 
   end_time = astar::Util::microtime();

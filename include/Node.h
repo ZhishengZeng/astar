@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 13:55:56
+ * @LastEditTime: 2021-09-15 15:47:24
  * @FilePath: /AStar/include/Node.h
  */
 
@@ -39,6 +39,7 @@ class Node
   NodeType& get_type() { return _type; }
   NodeState& get_state() { return _state; }
   Node* get_parent_node() { return _parent_node; }
+  double get_self_cost() const { return _self_cost; }
   double get_known_cost() const { return _known_cost; }
   double get_est_cost() const { return _est_cost; }
   double get_total_cost() const { return (_known_cost + _est_cost); }
@@ -52,6 +53,7 @@ class Node
   void set_type(const NodeType& type) { _type = type; }
   void set_state(const NodeState& state) { _state = state; }
   void set_parent_node(Node* parent_node) { _parent_node = parent_node; }
+  void set_self_cost(const double self_cost) { _self_cost = self_cost; }
   void set_known_cost(const double known_cost) { _known_cost = known_cost; }
   void set_est_cost(const double est_cost) { _est_cost = est_cost; }
   void set_on_path(const bool on_path) { _on_path = on_path; }
@@ -67,7 +69,10 @@ class Node
   NodeType _type = NodeType::kNone;
   NodeState _state = NodeState::kNone;
   Node* _parent_node = nullptr;
+  double _self_cost = 0;
+  // start to self
   double _known_cost = 0;
+  // self to end
   double _est_cost = 0;
   bool _on_path = false;
 };

@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 14:10:39
+ * @LastEditTime: 2021-09-15 17:17:29
  * @FilePath: /AStar/tests/simple.cpp
  */
 
@@ -15,81 +15,15 @@
 #include "Model.h"
 int main()
 {
-  {
-    astar::Model astar_model;
-    astar_model.setMapSize(8, 5);
-    astar_model.setObstacle({{2, 1},
-                             {0, 3},
-                             {1, 3},
-                             {3, 2},
-                             {4, 2},
-                             {4, 4},
-                             {5, 3},
-                             {5, 3},
-                             {6, 2},
-                             {6, 3},
-                             {7, 2},
-                             {7, 3}});
-    astar_model.setRoutingMode(true, true);
-    astar_model.findPath({0, 4}, {7, 0});
-  }
+  astar::GridMap<double> cost_map;
 
-  {
-    astar::Model astar_model;
-    astar_model.setMapSize(8, 5);
-    astar_model.setObstacle({{2, 1},
-                             {0, 3},
-                             {1, 3},
-                             {3, 2},
-                             {4, 2},
-                             {4, 4},
-                             {5, 3},
-                             {5, 3},
-                             {6, 2},
-                             {6, 3},
-                             {7, 2},
-                             {7, 3}});
-    astar_model.setRoutingMode(false, true);
-    astar_model.findPath({0, 4}, {7, 0});
-  }
-
-  {
-    astar::Model astar_model;
-    astar_model.setMapSize(8, 5);
-    astar_model.setObstacle({{2, 1},
-                             {0, 3},
-                             {1, 3},
-                             {3, 2},
-                             {4, 2},
-                             {4, 4},
-                             {5, 3},
-                             {5, 3},
-                             {6, 2},
-                             {6, 3},
-                             {7, 2},
-                             {7, 3}});
-    astar_model.setRoutingMode(true, false);
-    astar_model.findPath({0, 4}, {7, 0});
-  }
-
-  {
-    astar::Model astar_model;
-    astar_model.setMapSize(8, 5);
-    astar_model.setObstacle({{2, 1},
-                             {0, 3},
-                             {1, 3},
-                             {3, 2},
-                             {4, 2},
-                             {4, 4},
-                             {5, 3},
-                             {5, 3},
-                             {6, 2},
-                             {6, 3},
-                             {7, 2},
-                             {7, 3}});
-    astar_model.setRoutingMode(false, false);
-    astar_model.findPath({0, 4}, {7, 0});
-  }
+  astar::Model astar_model;
+  astar_model.buildMap(4, 3);
+  astar_model.addNodeCost({{{1, 0}, 10}, {{1, 1}, 10}, {{2, 0}, 10}, {{2, 1}, 10}, {{3, 0}, 10}, {{3, 1}, 10}});
+  astar_model.addObstacle({{2, 0}, {1, 2}});
+  astar_model.disableDiagonalRouting();
+  astar_model.enableTurningBack();
+  astar_model.findPath({1, 0}, {3, 2});
 
   return 0;
 }
