@@ -28,7 +28,7 @@ TEST(RoutingTest, Reached)
   astar_model.addObstacle({6, 3});
   astar_model.addObstacle({7, 2});
   astar_model.addObstacle({7, 3});
-  EXPECT_TRUE(astar_model.findPath({0, 3}, {7, 0}).size());
+  EXPECT_TRUE(astar_model.getPath({0, 3}, {7, 0}).size());
 }
 
 TEST(RoutingTest, NoWhere)
@@ -48,7 +48,7 @@ TEST(RoutingTest, NoWhere)
   astar_model.addObstacle({6, 3});
   astar_model.addObstacle({7, 2});
   astar_model.addObstacle({7, 3});
-  EXPECT_FALSE(astar_model.findPath({0, 3}, {7, 0}).size());
+  EXPECT_FALSE(astar_model.getPath({0, 3}, {7, 0}).size());
 }
 
 TEST(RoutingTest, Reached1)
@@ -68,7 +68,7 @@ TEST(RoutingTest, Reached1)
   astar_model.addObstacle({7, 3});
   astar_model.disableDiagonalRouting();
   astar_model.enableTurningBack();
-  EXPECT_TRUE(astar_model.findPath({0, 4}, {7, 0}).size());
+  EXPECT_TRUE(astar_model.getPath({0, 4}, {7, 0}).size());
 }
 
 TEST(RoutingTest, NoWhere1)
@@ -88,7 +88,7 @@ TEST(RoutingTest, NoWhere1)
   astar_model.addObstacle({7, 3});
   astar_model.disableDiagonalRouting();
   astar_model.disableTurningBack();
-  EXPECT_FALSE(astar_model.findPath({0, 4}, {7, 0}).size());
+  EXPECT_FALSE(astar_model.getPath({0, 4}, {7, 0}).size());
 }
 
 }  // namespace

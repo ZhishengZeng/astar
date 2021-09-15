@@ -45,7 +45,7 @@ class Model
   void disableDiagonalRouting();
   void enableTurningBack();
   void disableTurningBack();
-  std::vector<Coordinate> findPath(const Coordinate& start_coord, const Coordinate& end_coord);
+  std::vector<Coordinate> getPath(const Coordinate& start_coord, const Coordinate& end_coord);
   void addCostToMap();
   void addObsToMap();
   Node* setNode(const Coordinate& coord, const NodeType& node_type);

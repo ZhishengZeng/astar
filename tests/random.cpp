@@ -40,7 +40,7 @@ int main()
   for (size_t i = 1; i < coord_list.size() - 1; i++) {
     astar_model.addObstacle(coord_list[i]);
   }
-  astar_model.findPath(coord_list.front(), coord_list.back());
+  astar_model.getPath(coord_list.front(), coord_list.back());
 
   end_time = astar::Util::microtime();
   std::cout << "[AStar Info] Run time:" << (end_time - start_time) << std::endl;

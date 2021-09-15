@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 19:51:59
+ * @LastEditTime: 2021-09-15 20:04:56
  * @FilePath: /AStar/tests/simple.cpp
  */
 
@@ -27,7 +27,7 @@ int main()
   astar_model.addObstacle({1, 2});
   astar_model.disableDiagonalRouting();
   astar_model.enableTurningBack();
-  astar_model.findPath({1, 0}, {3, 2});
+  astar_model.getPath({1, 0}, {3, 2});
 
   return 0;
 }

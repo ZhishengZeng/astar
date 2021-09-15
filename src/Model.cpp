@@ -53,7 +53,7 @@ void Model::disableTurningBack()
   _turning_back = false;
 }
 
-std::vector<Coordinate> Model::findPath(const Coordinate& start_coord, const Coordinate& end_coord)
+std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coordinate& end_coord)
 {
   std::vector<Coordinate> path_coord;
 
