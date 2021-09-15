@@ -1,7 +1,9 @@
 /*
- * @Author: ZengZhisheng
- * @Date: 2021-06-18 16:49:08
+ * @Author: Zhisheng Zeng
+ * @Date: 2021-09-05 21:50:09
  * @Description:
+ * @LastEditors: Zhisheng Zeng
+ * @LastEditTime: 2021-09-15 13:55:56
  * @FilePath: /AStar/include/Node.h
  */
 
@@ -42,7 +44,7 @@ class Node
   double get_total_cost() const { return (_known_cost + _est_cost); }
   bool get_on_path() { return _on_path; }
 
-  void set_coord(const int x,const int y)
+  void set_coord(const int x, const int y)
   {
     _coord.set_x(x);
     _coord.set_y(y);
