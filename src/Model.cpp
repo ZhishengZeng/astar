@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-16 15:10:58
+ * @LastEditTime: 2021-09-16 15:46:35
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -11,6 +11,12 @@
 #include "Util.h"
 namespace astar {
 
+/**
+ * @description: 建立一个x_size*y_size的grid_map
+ * @param {int} x_size
+ * @param {int} y_size
+ * @return {*}
+ */
 void Model::buildMap(int x_size, int y_size)
 {
   assert(x_size > 0 && y_size > 0);
@@ -23,11 +29,26 @@ void Model::buildMap(int x_size, int y_size)
   }
 }
 
+/**
+ * @description: Add node cost. Node cost is 0 by default
+ * @param {Coordinate} coord
+ * @param {double} cost
+ * @return {*}
+ */
 void Model::addNodeCost(const Coordinate& coord, const double cost)
 {
   _cost_list.emplace_back(coord, cost);
 }
 
+/**
+ * @description:Add obstacle node
+ *              Horizontal-OBS type_flag='H'
+ *              Vertical-OBS type_flag='V'
+ *              Omnidirectional-OBS type_flag='O'
+ * @param {Coordinate} coord
+ * @param {char} type_flag
+ * @return {*}
+ */
 void Model::addObstacle(const Coordinate& coord, const char type_flag)
 {
   NodeType type;
@@ -38,36 +59,70 @@ void Model::addObstacle(const Coordinate& coord, const char type_flag)
     case 'V':
       type = NodeType::kVObs;
       break;
-    case 'A':
-      type = NodeType::kAObs;
+    case 'O':
+      type = NodeType::kObs;
       break;
     default:
-      type = NodeType::kAObs;
+      type = NodeType::kObs;
       break;
   }
   _obs_list.emplace_back(coord, type);
 }
 
+/**
+ * @description: Oblique winding is allowed
+ * @param {*}
+ * @return {*}
+ */
 void Model::enableDiagonalRouting()
 {
   _routing_diagonal = true;
 }
 
+/**
+ * @description: Oblique winding is not allowed
+ * @param {*}
+ * @return {*}
+ */
 void Model::disableDiagonalRouting()
 {
   _routing_diagonal = false;
 }
 
+/**
+ * @description: Turn back line is allowed
+ * @param {*}
+ * @return {*}
+ */
 void Model::enableTurningBack()
 {
   _turning_back = true;
 }
 
+/**
+ * @description: Turn back line is not allowed
+ * @param {*}
+ * @return {*}
+ */
 void Model::disableTurningBack()
 {
   _turning_back = false;
 }
 
+/**
+ * @description: Returns multiple key points on the path
+ * eg: s x1 x2 x3 e
+ *                      e(end)
+ *                      │
+ *                      │
+ *                x2────x3
+ *                │
+ *                │
+ *  (start)s──────x1
+ * @param {Coordinate} start_coord
+ * @param {Coordinate} end_coord
+ * @return {*}
+ */
 std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coordinate& end_coord)
 {
   std::vector<Coordinate> path_coord;
@@ -392,7 +447,7 @@ void Model::printNode(Node& node)
           exit(1);
       }
       break;
-    case NodeType::kAObs:
+    case NodeType::kObs:
       printf("\33[40m[AA.AA+AA.AA]\033[0m");
       break;
     case NodeType::kHObs:

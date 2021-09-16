@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-16 14:49:22
+ * @LastEditTime: 2021-09-16 15:26:34
  * @FilePath: /AStar/include/Model.h
  */
 
@@ -45,6 +45,21 @@ class Model
   void enableTurningBack();
   void disableTurningBack();
   std::vector<Coordinate> getPath(const Coordinate& start_coord, const Coordinate& end_coord);
+
+ private:
+  // input
+  GridMap<Node> _grid_map;
+  std::vector<std::pair<Coordinate, double>> _cost_list;
+  std::vector<std::pair<Coordinate, NodeType>> _obs_list;
+  bool _turning_back = true;
+  bool _routing_diagonal = false;
+  Node* _start_node = nullptr;
+  Node* _end_node = nullptr;
+  Node* _curr_node = nullptr;
+  double _min_node_cost = 0;
+  std::vector<Coordinate> _offset_list;
+  std::priority_queue<Node*, std::vector<Node*>, cmpNodeCost> _open_list;
+
   void addCostToMap();
   void addObsToMap();
   Node* setNode(const Coordinate& coord, const NodeType& node_type);
@@ -71,20 +86,6 @@ class Model
   Direction getDirection(Node* start_node, Node* end_node);
   bool isHorizontal(Coordinate& start_coord, Coordinate& end_coord);
   bool isVertical(Coordinate& start_coord, Coordinate& end_coord);
-
- private:
-  // input
-  GridMap<Node> _grid_map;
-  std::vector<std::pair<Coordinate, double>> _cost_list;
-  std::vector<std::pair<Coordinate, NodeType>> _obs_list;
-  bool _turning_back = true;
-  bool _routing_diagonal = false;
-  Node* _start_node = nullptr;
-  Node* _end_node = nullptr;
-  Node* _curr_node = nullptr;
-  double _min_node_cost = 0;
-  std::vector<Coordinate> _offset_list;
-  std::priority_queue<Node*, std::vector<Node*>, cmpNodeCost> _open_list;
 };
 
 }  // namespace astar
