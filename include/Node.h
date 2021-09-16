@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-16 15:01:19
+ * @LastEditTime: 2021-09-16 23:30:15
  * @FilePath: /AStar/include/Node.h
  */
 
@@ -21,7 +21,7 @@ enum class NodeType
   kEnd = 2,
   kHObs = 3,
   kVObs = 4,
-  kObs = 5
+  kOObs = 5
 };
 
 enum class NodeState
@@ -62,7 +62,7 @@ class Node
   // function
   bool isStart() { return _type == NodeType::kStart; }
   bool isEnd() { return _type == NodeType::kEnd; }
-  bool isAObs() { return _type == NodeType::kObs; }
+  bool isOObs() { return _type == NodeType::kOObs; }
   bool isHObs() { return _type == NodeType::kHObs; }
   bool isVObs() { return _type == NodeType::kVObs; }
   bool isOpen() { return _state == NodeState::kOpen; }

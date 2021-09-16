@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-16 15:46:35
+ * @LastEditTime: 2021-09-17 00:00:33
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -60,10 +60,11 @@ void Model::addObstacle(const Coordinate& coord, const char type_flag)
       type = NodeType::kVObs;
       break;
     case 'O':
-      type = NodeType::kObs;
+      type = NodeType::kOObs;
       break;
     default:
-      type = NodeType::kObs;
+      std::cout << "[Error] NodeType is not OBS!" << std::endl;
+      exit(1);
       break;
   }
   _obs_list.emplace_back(coord, type);
@@ -111,14 +112,15 @@ void Model::disableTurningBack()
 
 /**
  * @description: Returns multiple key points on the path
- * eg: s x1 x2 x3 e
- *                      e(end)
- *                      │
- *                      │
- *                x2────x3
- *                │
- *                │
- *  (start)s──────x1
+ * eg:
+ *                        e(end)   return s x1 x2 x3 e
+ *                         │
+ *                         │
+ *                  x2────x3
+ *                  │
+ *                  │
+ *    (start)s──────x1
+ *
  * @param {Coordinate} start_coord
  * @param {Coordinate} end_coord
  * @return {*}
@@ -291,26 +293,34 @@ void Model::initOffsetList()
   x_offset = (x_offset != 0 ? x_offset / std::abs(x_offset) : x_offset);
   y_offset = (y_offset != 0 ? y_offset / std::abs(y_offset) : y_offset);
 
-  if (x_offset != 0) {
-    _offset_list.emplace_back(x_offset, 0);
-    if (_turning_back) {
-      _offset_list.emplace_back(-1 * x_offset, 0);
+  if (_turning_back) {
+    _offset_list.emplace_back(1, 0);
+    _offset_list.emplace_back(-1, 0);
+  } else {
+    if (x_offset != 0) {
+      _offset_list.emplace_back(x_offset, 0);
     }
   }
 
-  if (y_offset != 0) {
-    _offset_list.emplace_back(0, y_offset);
-    if (_turning_back) {
-      _offset_list.emplace_back(0, -1 * y_offset);
+  if (_turning_back) {
+    _offset_list.emplace_back(0, 1);
+    _offset_list.emplace_back(0, -1);
+  } else {
+    if (y_offset != 0) {
+      _offset_list.emplace_back(0, y_offset);
     }
   }
 
-  if (_routing_diagonal && x_offset != 0 && y_offset != 0) {
-    _offset_list.emplace_back(x_offset, y_offset);
+  if (_routing_diagonal) {
     if (_turning_back) {
-      _offset_list.emplace_back(-1 * x_offset, y_offset);
-      _offset_list.emplace_back(x_offset, -1 * y_offset);
-      _offset_list.emplace_back(-1 * x_offset, -1 * y_offset);
+      _offset_list.emplace_back(1, 1);
+      _offset_list.emplace_back(1, -1);
+      _offset_list.emplace_back(-1, 1);
+      _offset_list.emplace_back(-1, -1);
+    } else {
+      if (x_offset != 0 && y_offset != 0) {
+        _offset_list.emplace_back(x_offset, y_offset);
+      }
     }
   }
   std::sort(_offset_list.begin(), _offset_list.end(), cmpCoordinate());
@@ -331,7 +341,7 @@ void Model::addNeighborNodesToOpenList()
   std::vector<Node*> neighbor_node_list;
   getNeighborNodesByCurr(neighbor_node_list);
   for (Node* neighbor_node : neighbor_node_list) {
-    if (neighbor_node->isClose() || neighbor_node->isAObs()) {
+    if (neighbor_node->isClose() || neighbor_node->isOObs()) {
       continue;
     }
     if (neighbor_node->isHObs() && isHorizontal(_curr_node->get_coord(), neighbor_node->get_coord())) {
@@ -447,8 +457,8 @@ void Model::printNode(Node& node)
           exit(1);
       }
       break;
-    case NodeType::kObs:
-      printf("\33[40m[AA.AA+AA.AA]\033[0m");
+    case NodeType::kOObs:
+      printf("\33[40m[OO.OO+OO.OO]\033[0m");
       break;
     case NodeType::kHObs:
       printf("\33[40m[HH.HH+HH.HH]\033[0m");
