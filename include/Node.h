@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 15:47:24
+ * @LastEditTime: 2021-09-16 15:01:19
  * @FilePath: /AStar/include/Node.h
  */
 
@@ -16,10 +16,12 @@ namespace astar {
 
 enum class NodeType
 {
-  kObs = -1,
   kNone = 0,
   kStart = 1,
-  kEnd = 2
+  kEnd = 2,
+  kHObs = 3,
+  kVObs = 4,
+  kAObs = 5
 };
 
 enum class NodeState
@@ -60,7 +62,9 @@ class Node
   // function
   bool isStart() { return _type == NodeType::kStart; }
   bool isEnd() { return _type == NodeType::kEnd; }
-  bool isObs() { return _type == NodeType::kObs; }
+  bool isAObs() { return _type == NodeType::kAObs; }
+  bool isHObs() { return _type == NodeType::kHObs; }
+  bool isVObs() { return _type == NodeType::kVObs; }
   bool isOpen() { return _state == NodeState::kOpen; }
   bool isClose() { return _state == NodeState::kClose; }
 

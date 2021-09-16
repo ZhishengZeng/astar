@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 19:50:17
+ * @LastEditTime: 2021-09-16 14:49:22
  * @FilePath: /AStar/include/Model.h
  */
 
@@ -24,7 +24,6 @@
 #include "Node.h"
 
 #define SHOWRESULT 1
-#define DIAGONAL 0
 
 namespace astar {
 class Model
@@ -39,8 +38,8 @@ class Model
   }
 
   void buildMap(int x_size, int y_size);
-  void addNodeCost(const std::pair<Coordinate, double>& coord_cost);
-  void addObstacle(const Coordinate& obs_coord);
+  void addNodeCost(const Coordinate& coord, const double cost);
+  void addObstacle(const Coordinate& coord, const char type);
   void enableDiagonalRouting();
   void disableDiagonalRouting();
   void enableTurningBack();
@@ -76,8 +75,8 @@ class Model
  private:
   // input
   GridMap<Node> _grid_map;
-  std::vector<std::pair<Coordinate, double>> _coord_cost_list;
-  std::vector<Coordinate> _obs_coord_list;
+  std::vector<std::pair<Coordinate, double>> _cost_list;
+  std::vector<std::pair<Coordinate, NodeType>> _obs_list;
   bool _turning_back = true;
   bool _routing_diagonal = false;
   Node* _start_node = nullptr;

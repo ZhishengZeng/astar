@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 19:53:26
+ * @LastEditTime: 2021-09-16 15:05:05
  * @FilePath: /AStar/tests/random.cpp
  */
 
@@ -38,7 +38,7 @@ int main()
 
   std::vector<astar::Coordinate> obs_coord_list;
   for (size_t i = 1; i < coord_list.size() - 1; i++) {
-    astar_model.addObstacle(coord_list[i]);
+    astar_model.addObstacle(coord_list[i], 'A');
   }
   astar_model.getPath(coord_list.front(), coord_list.back());
 

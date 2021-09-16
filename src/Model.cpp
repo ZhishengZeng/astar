@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 19:51:01
+ * @LastEditTime: 2021-09-16 15:10:58
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -23,14 +23,29 @@ void Model::buildMap(int x_size, int y_size)
   }
 }
 
-void Model::addNodeCost(const std::pair<Coordinate, double>& coord_cost)
+void Model::addNodeCost(const Coordinate& coord, const double cost)
 {
-  _coord_cost_list.push_back(coord_cost);
+  _cost_list.emplace_back(coord, cost);
 }
 
-void Model::addObstacle(const Coordinate& obs_coord)
+void Model::addObstacle(const Coordinate& coord, const char type_flag)
 {
-  _obs_coord_list.push_back(obs_coord);
+  NodeType type;
+  switch (type_flag) {
+    case 'H':
+      type = NodeType::kHObs;
+      break;
+    case 'V':
+      type = NodeType::kVObs;
+      break;
+    case 'A':
+      type = NodeType::kAObs;
+      break;
+    default:
+      type = NodeType::kAObs;
+      break;
+  }
+  _obs_list.emplace_back(coord, type);
 }
 
 void Model::enableDiagonalRouting()
@@ -88,9 +103,9 @@ void Model::addCostToMap()
 {
   std::map<Coordinate, double, cmpCoordinate> coord_cost_map;
   std::map<Coordinate, double>::iterator iter;
-  for (size_t i = 0; i < _coord_cost_list.size(); i++) {
-    const Coordinate& coord = _coord_cost_list[i].first;
-    double cost = _coord_cost_list[i].second;
+  for (size_t i = 0; i < _cost_list.size(); i++) {
+    const Coordinate& coord = _cost_list[i].first;
+    double cost = _cost_list[i].second;
 
     iter = coord_cost_map.find(coord);
     if (iter != coord_cost_map.end()) {
@@ -130,8 +145,8 @@ void Model::addCostToMap()
 
 void Model::addObsToMap()
 {
-  for (size_t i = 0; i < _obs_coord_list.size(); i++) {
-    setNode(_obs_coord_list[i], NodeType::kObs);
+  for (size_t i = 0; i < _obs_list.size(); i++) {
+    setNode(_obs_list[i].first, _obs_list[i].second);
   }
 }
 
@@ -141,13 +156,13 @@ Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
   assert(0 <= coord.get_y() && coord.get_y() < (int) _grid_map.get_y_size());
 
   Node& node = _grid_map[coord.get_x()][coord.get_y()];
-  if (node.get_type() == NodeType::kNone || node.get_type() == NodeType::kObs) {
+  if (node.isEnd() || node.isStart()) {
+    std::cout << "[AStar Error] [" << coord.get_x() << " , " << coord.get_y() << "] type is START or END!!"
+              << std::endl;
+    exit(1);
+  } else {
     node.set_type(node_type);
     return &node;
-  } else {
-    std::cout << "[AStar Error] [" << coord.get_x() << " , " << coord.get_y()
-              << "] type is not null!!" << std::endl;
-    exit(1);
   }
 }
 
@@ -261,7 +276,13 @@ void Model::addNeighborNodesToOpenList()
   std::vector<Node*> neighbor_node_list;
   getNeighborNodesByCurr(neighbor_node_list);
   for (Node* neighbor_node : neighbor_node_list) {
-    if (neighbor_node->isClose() || neighbor_node->isObs()) {
+    if (neighbor_node->isClose() || neighbor_node->isAObs()) {
+      continue;
+    }
+    if (neighbor_node->isHObs() && isHorizontal(_curr_node->get_coord(), neighbor_node->get_coord())) {
+      continue;
+    }
+    if (neighbor_node->isVObs() && isVertical(_curr_node->get_coord(), neighbor_node->get_coord())) {
       continue;
     }
     if (neighbor_node->isOpen()) {
@@ -371,8 +392,14 @@ void Model::printNode(Node& node)
           exit(1);
       }
       break;
-    case NodeType::kObs:
-      printf("\33[40m[%05.2lf+%05.2lf]\033[0m", 0.0, 0.0);
+    case NodeType::kAObs:
+      printf("\33[40m[AA.AA+AA.AA]\033[0m");
+      break;
+    case NodeType::kHObs:
+      printf("\33[40m[HH.HH+HH.HH]\033[0m");
+      break;
+    case NodeType::kVObs:
+      printf("\33[40m[VV.VV+VV.VV]\033[0m");
       break;
     case NodeType::kStart:
       printf("\33[42m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
