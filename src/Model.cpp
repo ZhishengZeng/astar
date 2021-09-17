@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-17 00:00:33
+ * @LastEditTime: 2021-09-17 11:22:36
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -344,11 +344,14 @@ void Model::addNeighborNodesToOpenList()
     if (neighbor_node->isClose() || neighbor_node->isOObs()) {
       continue;
     }
-    if (neighbor_node->isHObs() && isHorizontal(_curr_node->get_coord(), neighbor_node->get_coord())) {
-      continue;
-    }
-    if (neighbor_node->isVObs() && isVertical(_curr_node->get_coord(), neighbor_node->get_coord())) {
-      continue;
+    if (isHorizontal(_curr_node->get_coord(), neighbor_node->get_coord())) {
+      if (_curr_node->isHObs() || neighbor_node->isHObs()) {
+        continue;
+      }
+    } else if (isVertical(_curr_node->get_coord(), neighbor_node->get_coord())) {
+      if (_curr_node->isVObs() || neighbor_node->isVObs()) {
+        continue;
+      }
     }
     if (neighbor_node->isOpen()) {
       if (isCurrBetterParent(neighbor_node)) {
