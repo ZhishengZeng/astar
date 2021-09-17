@@ -15,8 +15,8 @@ ${PROJECT_SOURCE_DIR}/src/Model.cpp
 ${PROJECT_SOURCE_DIR}/src/Util.cpp
 )
 
-# ADD_COMPILE_OPTIONS("-fsanitize=address")
-# LINK_LIBRARIES("-fsanitize=address")
+ADD_COMPILE_OPTIONS("-fsanitize=address")
+LINK_LIBRARIES("-fsanitize=address")
 # SET(CMAKE_BUILD_TYPE "Release")
 # SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 SET(CMAKE_BUILD_TYPE "Debug")

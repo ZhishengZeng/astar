@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-17 22:52:30
+ * @LastEditTime: 2021-09-17 23:29:19
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -127,7 +127,7 @@ std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coor
   while (true) {
     // 获取当前最优结果点
     updateOptimalNode();
-    // 判断是否抵达终点
+    // 抵达终点
     if (_optimal_node->isEndPoint()) {
       break;
     }
@@ -275,39 +275,27 @@ void Model::addNodeToSearchQueue(Node* node)
 
 void Model::initOffsetList()
 {
-  int x_offset = _end_node->get_coord().get_x() - _start_node->get_coord().get_x();
-  int y_offset = _end_node->get_coord().get_y() - _start_node->get_coord().get_y();
-  x_offset = (x_offset != 0 ? x_offset / std::abs(x_offset) : x_offset);
-  y_offset = (y_offset != 0 ? y_offset / std::abs(y_offset) : y_offset);
-
   if (_config.isTurningBack()) {
-    _offset_list.emplace_back(1, 0);
-    _offset_list.emplace_back(-1, 0);
-  } else {
-    if (x_offset != 0) {
-      _offset_list.emplace_back(x_offset, 0);
-    }
-  }
-
-  if (_config.isTurningBack()) {
-    _offset_list.emplace_back(0, 1);
-    _offset_list.emplace_back(0, -1);
-  } else {
-    if (y_offset != 0) {
-      _offset_list.emplace_back(0, y_offset);
-    }
-  }
-
-  if (_config.isRoutingDiagonal()) {
-    if (_config.isTurningBack()) {
+    _offset_list = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    if (_config.isRoutingDiagonal()) {
       _offset_list.emplace_back(1, 1);
       _offset_list.emplace_back(1, -1);
       _offset_list.emplace_back(-1, 1);
       _offset_list.emplace_back(-1, -1);
-    } else {
-      if (x_offset != 0 && y_offset != 0) {
-        _offset_list.emplace_back(x_offset, y_offset);
-      }
+    }
+  } else {
+    int x_offset = _end_node->get_coord().get_x() - _start_node->get_coord().get_x();
+    int y_offset = _end_node->get_coord().get_y() - _start_node->get_coord().get_y();
+    x_offset = (x_offset != 0 ? x_offset / std::abs(x_offset) : x_offset);
+    y_offset = (y_offset != 0 ? y_offset / std::abs(y_offset) : y_offset);
+    if (x_offset != 0) {
+      _offset_list.emplace_back(x_offset, 0);
+    }
+    if (y_offset != 0) {
+      _offset_list.emplace_back(0, y_offset);
+    }
+    if (x_offset != 0 && y_offset != 0) {
+      _offset_list.emplace_back(x_offset, y_offset);
     }
   }
   std::sort(_offset_list.begin(), _offset_list.end(), cmpCoordinate());

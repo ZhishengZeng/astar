@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-17 16:51:37
+ * @LastEditTime: 2021-09-17 23:32:03
  * @FilePath: /AStar/include/Model.h
  */
 
@@ -60,17 +60,15 @@ class Model
 
   void init(const Coordinate& start_coord, const Coordinate& end_coord);
   void initGridMap();
+  void addStartNodeToGridMap(const Coordinate& coord);
+  void addEndNodeToGridMap(const Coordinate& coord);
   void addCostToGridMap();
   void addObsToGridMap();
   Node* setNode(const Coordinate& coord, const NodeType& node_type);
-  void addStartNodeToGridMap(const Coordinate& coord);
   void initStartNode();
   void updateEstCost(Node* node);
   double caculateEstCost(Node* a, Node* b);
-  void updateParentByOptimalNode(Node* node);
-  double getWalkingCost(Node* node1, Node* node2);
   void addNodeToSearchQueue(Node* node);
-  void addEndNodeToGridMap(const Coordinate& coord);
   void initOffsetList();
   void updateOptimalNode();
   void expandSearchQueue();
@@ -78,7 +76,8 @@ class Model
   bool checkCoord(const int x, const int y);
   bool checkNode(const int x, const int y);
   bool needReplaceParentNode(Node* node);
-  ////////////
+  double getWalkingCost(Node* node1, Node* node2);
+  void updateParentByOptimalNode(Node* node);
   void showResult();
   void setOnPath(const bool on_path);
   void printGridMap();
