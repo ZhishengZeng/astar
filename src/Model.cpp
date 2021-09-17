@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-17 16:55:07
+ * @LastEditTime: 2021-09-17 22:52:30
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -193,8 +193,8 @@ void Model::addCostToGridMap()
     }
   }
 
-  for (size_t x = 0; x < _grid_map.get_x_size(); x++) {
-    for (size_t y = 0; y < _grid_map.get_y_size(); y++) {
+  for (int x = 0; x < _grid_map.get_x_size(); x++) {
+    for (int y = 0; y < _grid_map.get_y_size(); y++) {
       Coordinate coord(x, y);
       if (coord_cost_map.find(coord) == coord_cost_map.end()) {
         coord_cost_map.insert(std::map<Coordinate, double>::value_type(coord, 0));
@@ -235,14 +235,10 @@ Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
   assert(0 <= coord.get_y() && coord.get_y() < (int) _grid_map.get_y_size());
 
   Node& node = _grid_map[coord.get_x()][coord.get_y()];
-  if (node.isEndPoint() || node.isStartPoint()) {
-    std::cout << "[AStar Error] [" << coord.get_x() << " , " << coord.get_y() << "] type is START or END!!"
-              << std::endl;
-    exit(1);
-  } else {
+  if (!node.isEndPoint() && !node.isStartPoint()) {
     node.set_type(node_type);
-    return &node;
   }
+  return &node;
 }
 
 void Model::initStartNode()

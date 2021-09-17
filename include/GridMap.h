@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 14:10:51
+ * @LastEditTime: 2021-09-17 22:52:12
  * @FilePath: /AStar/include/GridMap.h
  */
 
@@ -50,31 +50,31 @@ class GridMap
     other._array = nullptr;
     return (*this);
   }
-  T* operator[](const size_t i)
+  T* operator[](const int i)
   {
     assert(0 <= i && i < _x_size);
     return _array[i];
   }
   // getter
-  size_t get_x_size() const { return _x_size; }
-  size_t get_y_size() const { return _y_size; }
+  int get_x_size() const { return _x_size; }
+  int get_y_size() const { return _y_size; }
   // setter
 
   // function
-  void init(size_t x_size = 0, size_t y_size = 0);
-  T** initArray(size_t x_size, size_t y_size);
-  T** cloneArray(T** other_array, size_t x_size, size_t y_size);
+  void init(int x_size = 0, int y_size = 0);
+  T** initArray(int x_size, int y_size);
+  T** cloneArray(T** other_array, int x_size, int y_size);
   void freeArray(T** array);
   bool isEmpty();
 
  private:
-  size_t _x_size = 0;
-  size_t _y_size = 0;
+  int _x_size = 0;
+  int _y_size = 0;
   T** _array = nullptr;
 };
 
 template <typename T>
-inline void GridMap<T>::init(size_t x_size, size_t y_size)
+inline void GridMap<T>::init(int x_size, int y_size)
 {
   _x_size = x_size;
   _y_size = y_size;
@@ -82,25 +82,26 @@ inline void GridMap<T>::init(size_t x_size, size_t y_size)
 }
 
 template <typename T>
-inline T** GridMap<T>::initArray(size_t x_size, size_t y_size)
+inline T** GridMap<T>::initArray(int x_size, int y_size)
 {
+  assert(x_size >= 0 && y_size >= 0);
   if (x_size == 0 || y_size == 0) {
     return nullptr;
   }
   T** array = new T*[x_size];
   array[0] = new T[x_size * y_size];
-  for (size_t i = 1; i < x_size; i++) {
+  for (int i = 1; i < x_size; i++) {
     array[i] = array[i - 1] + y_size;
   }
   return array;
 }
 
 template <typename T>
-inline T** GridMap<T>::cloneArray(T** other_array, size_t x_size, size_t y_size)
+inline T** GridMap<T>::cloneArray(T** other_array, int x_size, int y_size)
 {
   T** array = initArray(x_size, y_size);
-  for (size_t i = 0; i < x_size; i++) {
-    for (size_t j = 0; j < y_size; j++) {
+  for (int i = 0; i < x_size; i++) {
+    for (int j = 0; j < y_size; j++) {
       array[i][j] = other_array[i][j];
     }
   }
