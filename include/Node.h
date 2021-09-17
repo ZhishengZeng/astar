@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-16 23:30:15
+ * @LastEditTime: 2021-09-17 15:02:48
  * @FilePath: /AStar/include/Node.h
  */
 
@@ -11,25 +11,10 @@
 #define ASTAR_INCLUDE_NODE_H_
 
 #include "Coordinate.h"
+#include "NodeState.h"
+#include "NodeType.h"
 
 namespace astar {
-
-enum class NodeType
-{
-  kNone = 0,
-  kStart = 1,
-  kEnd = 2,
-  kHObs = 3,
-  kVObs = 4,
-  kOObs = 5
-};
-
-enum class NodeState
-{
-  kNone = 0,
-  kOpen = 1,
-  kClose = 2
-};
 
 class Node
 {
@@ -60,13 +45,14 @@ class Node
   void set_est_cost(const double est_cost) { _est_cost = est_cost; }
   void set_on_path(const bool on_path) { _on_path = on_path; }
   // function
-  bool isStart() { return _type == NodeType::kStart; }
-  bool isEnd() { return _type == NodeType::kEnd; }
-  bool isOObs() { return _type == NodeType::kOObs; }
+  bool isStartPoint() { return _type == NodeType::kStart; }
+  bool isEndPoint() { return _type == NodeType::kEnd; }
+  bool isOmniObs() { return _type == NodeType::kOmniObs; }
   bool isHObs() { return _type == NodeType::kHObs; }
   bool isVObs() { return _type == NodeType::kVObs; }
-  bool isOpen() { return _state == NodeState::kOpen; }
-  bool isClose() { return _state == NodeState::kClose; }
+  bool isNoneState() { return _state == NodeState::kNone; }
+  bool isOpenState() { return _state == NodeState::kOpen; }
+  bool isCloseState() { return _state == NodeState::kClose; }
 
  private:
   Coordinate _coord;

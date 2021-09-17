@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-17 11:22:36
+ * @LastEditTime: 2021-09-17 16:55:07
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -19,14 +19,8 @@ namespace astar {
  */
 void Model::buildMap(int x_size, int y_size)
 {
-  assert(x_size > 0 && y_size > 0);
-
-  _grid_map.init(x_size, y_size);
-  for (int i = 0; i < (int) _grid_map.get_x_size(); i++) {
-    for (int j = 0; j < (int) _grid_map.get_y_size(); j++) {
-      _grid_map[i][j].set_coord(i, j);
-    }
-  }
+  _config.set_map_x_size(x_size);
+  _config.set_map_y_size(y_size);
 }
 
 /**
@@ -37,7 +31,8 @@ void Model::buildMap(int x_size, int y_size)
  */
 void Model::addNodeCost(const Coordinate& coord, const double cost)
 {
-  _cost_list.emplace_back(coord, cost);
+  std::vector<std::pair<Coordinate, double>>& coord_cost_list = _config.get_coord_cost_list();
+  coord_cost_list.emplace_back(coord, cost);
 }
 
 /**
@@ -60,34 +55,35 @@ void Model::addObstacle(const Coordinate& coord, const char type_flag)
       type = NodeType::kVObs;
       break;
     case 'O':
-      type = NodeType::kOObs;
+      type = NodeType::kOmniObs;
       break;
     default:
       std::cout << "[Error] NodeType is not OBS!" << std::endl;
       exit(1);
       break;
   }
-  _obs_list.emplace_back(coord, type);
+  std::vector<std::pair<Coordinate, NodeType>>& coord_type_list = _config.get_coord_type_list();
+  coord_type_list.emplace_back(coord, type);
 }
 
 /**
- * @description: Oblique winding is allowed
+ * @description: Oblique routing is allowed
  * @param {*}
  * @return {*}
  */
 void Model::enableDiagonalRouting()
 {
-  _routing_diagonal = true;
+  _config.set_routing_diagonal(true);
 }
 
 /**
- * @description: Oblique winding is not allowed
+ * @description: Oblique routing is not allowed
  * @param {*}
  * @return {*}
  */
 void Model::disableDiagonalRouting()
 {
-  _routing_diagonal = false;
+  _config.set_routing_diagonal(false);
 }
 
 /**
@@ -97,7 +93,7 @@ void Model::disableDiagonalRouting()
  */
 void Model::enableTurningBack()
 {
-  _turning_back = true;
+  _config.set_turning_back(true);
 }
 
 /**
@@ -107,45 +103,38 @@ void Model::enableTurningBack()
  */
 void Model::disableTurningBack()
 {
-  _turning_back = false;
+  _config.set_turning_back(false);
 }
 
 /**
  * @description: Returns multiple key points on the path
  * eg:
- *                        e(end)   return s x1 x2 x3 e
- *                         │
- *                         │
- *                  x2────x3
- *                  │
- *                  │
- *    (start)s──────x1
+ *                            e(end)
+ *                            │
+ *                            │
+ *                    x2 ──── x3          return {s x1 x2 x3 e}
+ *                    │
+ *                    │
+ *    (start)s ────── x1
  *
  * @param {Coordinate} start_coord
  * @param {Coordinate} end_coord
- * @return {*}
+ * @return {std::vector<Coordinate>}
  */
 std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coordinate& end_coord)
 {
-  std::vector<Coordinate> path_coord;
-
-  addCostToMap();
-  addObsToMap();
-  setStartNode(start_coord);
-  setEndNode(end_coord);
-  initStartNode();
-  initOffsetList();
+  init(start_coord, end_coord);
   while (true) {
     // 获取当前最优结果点
-    getMinCostNodeInOpenList();
+    updateOptimalNode();
     // 判断是否抵达终点
-    if (_curr_node->isEnd()) {
+    if (_optimal_node->isEndPoint()) {
       break;
     }
     // 搜寻备选下一步节点
-    addNeighborNodesToOpenList();
+    expandSearchQueue();
     // 无路可走
-    if (_open_list.empty()) {
+    if (_search_queue.empty()) {
       break;
     }
   }
@@ -156,13 +145,45 @@ std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coor
   return getPathCoord();
 }
 
-void Model::addCostToMap()
+void Model::init(const Coordinate& start_coord, const Coordinate& end_coord)
 {
+  initGridMap();
+  addStartNodeToGridMap(start_coord);
+  addEndNodeToGridMap(end_coord);
+  addCostToGridMap();
+  addObsToGridMap();
+  initStartNode();
+  initOffsetList();
+}
+
+void Model::initGridMap()
+{
+  _grid_map.init(_config.get_map_x_size(), _config.get_map_y_size());
+  for (int i = 0; i < (int) _grid_map.get_x_size(); i++) {
+    for (int j = 0; j < (int) _grid_map.get_y_size(); j++) {
+      _grid_map[i][j].set_coord(i, j);
+    }
+  }
+}
+
+void Model::addStartNodeToGridMap(const Coordinate& coord)
+{
+  _start_node = setNode(coord, NodeType::kStart);
+}
+
+void Model::addEndNodeToGridMap(const Coordinate& coord)
+{
+  _end_node = setNode(coord, NodeType::kEnd);
+}
+
+void Model::addCostToGridMap()
+{
+  std::vector<std::pair<Coordinate, double>>& coord_cost_list = _config.get_coord_cost_list();
   std::map<Coordinate, double, cmpCoordinate> coord_cost_map;
   std::map<Coordinate, double>::iterator iter;
-  for (size_t i = 0; i < _cost_list.size(); i++) {
-    const Coordinate& coord = _cost_list[i].first;
-    double cost = _cost_list[i].second;
+  for (size_t i = 0; i < coord_cost_list.size(); i++) {
+    const Coordinate& coord = coord_cost_list[i].first;
+    double cost = coord_cost_list[i].second;
 
     iter = coord_cost_map.find(coord);
     if (iter != coord_cost_map.end()) {
@@ -200,10 +221,11 @@ void Model::addCostToMap()
   }
 }
 
-void Model::addObsToMap()
+void Model::addObsToGridMap()
 {
-  for (size_t i = 0; i < _obs_list.size(); i++) {
-    setNode(_obs_list[i].first, _obs_list[i].second);
+  std::vector<std::pair<Coordinate, NodeType>>& coord_type_list = _config.get_coord_type_list();
+  for (size_t i = 0; i < coord_type_list.size(); i++) {
+    setNode(coord_type_list[i].first, coord_type_list[i].second);
   }
 }
 
@@ -213,7 +235,7 @@ Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
   assert(0 <= coord.get_y() && coord.get_y() < (int) _grid_map.get_y_size());
 
   Node& node = _grid_map[coord.get_x()][coord.get_y()];
-  if (node.isEnd() || node.isStart()) {
+  if (node.isEndPoint() || node.isStartPoint()) {
     std::cout << "[AStar Error] [" << coord.get_x() << " , " << coord.get_y() << "] type is START or END!!"
               << std::endl;
     exit(1);
@@ -223,22 +245,12 @@ Node* Model::setNode(const Coordinate& coord, const NodeType& node_type)
   }
 }
 
-void Model::setStartNode(const Coordinate& coord)
-{
-  _start_node = setNode(coord, NodeType::kStart);
-}
-
-void Model::setEndNode(const Coordinate& coord)
-{
-  _end_node = setNode(coord, NodeType::kEnd);
-}
-
 void Model::initStartNode()
 {
-  _curr_node = _start_node;
+  _start_node->set_known_cost(_start_node->get_self_cost());
+  _start_node->set_parent_node(_start_node);
   updateEstCost(_start_node);
-  updateParentByCurr(_start_node);
-  addNodeToOpenList(_start_node);
+  addNodeToSearchQueue(_start_node);
 }
 
 void Model::updateEstCost(Node* node)
@@ -251,7 +263,7 @@ double Model::caculateEstCost(Node* a, Node* b)
   int wire_length = 0;
   int length = std::abs(a->get_coord().get_x() - b->get_coord().get_x());
   int width = std::abs(a->get_coord().get_y() - b->get_coord().get_y());
-  if (_routing_diagonal) {
+  if (_config.isRoutingDiagonal()) {
     wire_length = (std::abs(length - width) + (length < width ? length : width) * 1.414);
   } else {
     wire_length = (length + width);
@@ -259,41 +271,20 @@ double Model::caculateEstCost(Node* a, Node* b)
   return (wire_length + wire_length * _min_node_cost);
 }
 
-void Model::updateParentByCurr(Node* node)
+void Model::addNodeToSearchQueue(Node* node)
 {
-  node->set_known_cost(_curr_node->get_known_cost() + getCurrWalkingCost(node));
-  node->set_parent_node(_curr_node);
-}
-
-double Model::getCurrWalkingCost(Node* node)
-{
-  Coordinate& node_coord = node->get_coord();
-  Coordinate& curr_coord = _curr_node->get_coord();
-  double walking_cost = 1;
-  if (node_coord.get_x() != curr_coord.get_x()
-      && node_coord.get_y() != curr_coord.get_y()) {
-    walking_cost = 1.414;
-  }
-  walking_cost += node->get_self_cost();
-  return walking_cost;
-}
-
-void Model::addNodeToOpenList(Node* node)
-{
-  _open_list.push(node);
+  _search_queue.push(node);
   node->set_state(NodeState::kOpen);
 }
 
 void Model::initOffsetList()
 {
-  int x_offset
-      = _end_node->get_coord().get_x() - _start_node->get_coord().get_x();
-  int y_offset
-      = _end_node->get_coord().get_y() - _start_node->get_coord().get_y();
+  int x_offset = _end_node->get_coord().get_x() - _start_node->get_coord().get_x();
+  int y_offset = _end_node->get_coord().get_y() - _start_node->get_coord().get_y();
   x_offset = (x_offset != 0 ? x_offset / std::abs(x_offset) : x_offset);
   y_offset = (y_offset != 0 ? y_offset / std::abs(y_offset) : y_offset);
 
-  if (_turning_back) {
+  if (_config.isTurningBack()) {
     _offset_list.emplace_back(1, 0);
     _offset_list.emplace_back(-1, 0);
   } else {
@@ -302,7 +293,7 @@ void Model::initOffsetList()
     }
   }
 
-  if (_turning_back) {
+  if (_config.isTurningBack()) {
     _offset_list.emplace_back(0, 1);
     _offset_list.emplace_back(0, -1);
   } else {
@@ -311,8 +302,8 @@ void Model::initOffsetList()
     }
   }
 
-  if (_routing_diagonal) {
-    if (_turning_back) {
+  if (_config.isRoutingDiagonal()) {
+    if (_config.isTurningBack()) {
       _offset_list.emplace_back(1, 1);
       _offset_list.emplace_back(1, -1);
       _offset_list.emplace_back(-1, 1);
@@ -329,80 +320,113 @@ void Model::initOffsetList()
   _offset_list.erase(erase_iter, _offset_list.end());
 }
 
-void Model::getMinCostNodeInOpenList()
+void Model::updateOptimalNode()
 {
-  _curr_node = _open_list.top();
-  _open_list.pop();
-  _curr_node->set_state(NodeState::kClose);
+  _optimal_node = _search_queue.top();
+  _search_queue.pop();
+  _optimal_node->set_state(NodeState::kClose);
 }
 
-void Model::addNeighborNodesToOpenList()
+void Model::expandSearchQueue()
+{
+  std::vector<Node*> neighbor_node_list = getNeighborsByOptimalNode();
+  for (size_t i = 0; i < neighbor_node_list.size(); i++) {
+    Node* neighbor_node = neighbor_node_list[i];
+    if (neighbor_node->isOpenState()) {
+      if (needReplaceParentNode(neighbor_node)) {
+        updateParentByOptimalNode(neighbor_node);
+      }
+    } else if (neighbor_node->isNoneState()) {
+      updateEstCost(neighbor_node);
+      updateParentByOptimalNode(neighbor_node);
+      addNodeToSearchQueue(neighbor_node);
+    } else {
+      std::cout << "[Error] Neighbor node is illegal!" << std::endl;
+    }
+  }
+}
+
+std::vector<Node*> Model::getNeighborsByOptimalNode()
 {
   std::vector<Node*> neighbor_node_list;
-  getNeighborNodesByCurr(neighbor_node_list);
-  for (Node* neighbor_node : neighbor_node_list) {
-    if (neighbor_node->isClose() || neighbor_node->isOObs()) {
-      continue;
-    }
-    if (isHorizontal(_curr_node->get_coord(), neighbor_node->get_coord())) {
-      if (_curr_node->isHObs() || neighbor_node->isHObs()) {
-        continue;
-      }
-    } else if (isVertical(_curr_node->get_coord(), neighbor_node->get_coord())) {
-      if (_curr_node->isVObs() || neighbor_node->isVObs()) {
-        continue;
-      }
-    }
-    if (neighbor_node->isOpen()) {
-      if (isCurrBetterParent(neighbor_node)) {
-        updateParentByCurr(neighbor_node);
-      }
-    } else {
-      updateEstCost(neighbor_node);
-      updateParentByCurr(neighbor_node);
-      addNodeToOpenList(neighbor_node);
-    }
-  }
-}
 
-void Model::getNeighborNodesByCurr(std::vector<Node*>& neighbor_node_list)
-{
-  Coordinate& curr_coord = _curr_node->get_coord();
-  int curr_coord_x = curr_coord.get_x();
-  int curr_coord_y = curr_coord.get_y();
+  Coordinate& optimal_coord = _optimal_node->get_coord();
+  int optimal_coord_x = optimal_coord.get_x();
+  int optimal_coord_y = optimal_coord.get_y();
 
   for (size_t i = 0; i < _offset_list.size(); i++) {
-    int x = curr_coord_x + _offset_list[i].get_x();
-    int y = curr_coord_y + _offset_list[i].get_y();
-    if (!isLegalNeighbor(x, y)) {
-      continue;
+    int x = optimal_coord_x + _offset_list[i].get_x();
+    int y = optimal_coord_y + _offset_list[i].get_y();
+    if (checkCoord(x, y) && checkNode(x, y)) {
+      neighbor_node_list.emplace_back(&_grid_map[x][y]);
     }
-    neighbor_node_list.push_back(&_grid_map[x][y]);
   }
+  return neighbor_node_list;
 }
 
-bool Model::isLegalNeighbor(int x, int y)
+bool Model::checkCoord(const int x, const int y)
 {
-  Coordinate& curr_coord = _curr_node->get_coord();
-  if (x == curr_coord.get_x() && y == curr_coord.get_y()) {
+  if (x < 0 || (int) _grid_map.get_x_size() <= x) {
     return false;
   }
-  return (0 <= x && x < (int) _grid_map.get_x_size())
-         && (0 <= y && y < (int) _grid_map.get_y_size());
+  if (y < 0 || (int) _grid_map.get_y_size() <= y) {
+    return false;
+  }
+  Coordinate& optimal_coord = _optimal_node->get_coord();
+  if (optimal_coord.get_x() == x && optimal_coord.get_y() == y) {
+    return false;
+  }
+  return true;
 }
 
-bool Model::isCurrBetterParent(Node* node)
+bool Model::checkNode(const int x, const int y)
 {
-  return (_curr_node->get_known_cost() + getCurrWalkingCost(node))
-         < node->get_known_cost();
+  Node* node = &_grid_map[x][y];
+  if (node->isCloseState() || node->isOmniObs()) {
+    return false;
+  }
+  Direction direction = getDirection(node, _optimal_node);
+  if (direction == Direction::kHorizontal) {
+    if (_optimal_node->isHObs() || node->isHObs()) {
+      return false;
+    }
+  } else if (direction == Direction::kVertical) {
+    if (_optimal_node->isVObs() || node->isVObs()) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool Model::needReplaceParentNode(Node* node)
+{
+  double cost = 0;
+  cost += _optimal_node->get_known_cost();
+  cost += getWalkingCost(_optimal_node, node);
+  cost += node->get_self_cost();
+
+  return cost < node->get_known_cost();
+}
+
+double Model::getWalkingCost(Node* node1, Node* node2)
+{
+  double walking_cost = 1;
+  if (getDirection(node1, node2) == Direction::kDiagonal) {
+    walking_cost = 1.414;
+  }
+  return walking_cost;
+}
+
+void Model::updateParentByOptimalNode(Node* node)
+{
+  node->set_known_cost(_optimal_node->get_known_cost() + getWalkingCost(_optimal_node, node) + node->get_self_cost());
+  node->set_parent_node(_optimal_node);
 }
 
 void Model::showResult()
 {
   if (_grid_map.get_x_size() > 50 || _grid_map.get_y_size() > 50) {
-    std::cout
-        << "[AStar Warning] Plot large map(larger than 50x50) , skipping..."
-        << std::endl;
+    std::cout << "[AStar Warning] Plot large map(larger than 50x50) , skipping..." << std::endl;
     return;
   }
   setOnPath(true);
@@ -412,14 +436,14 @@ void Model::showResult()
 
 void Model::setOnPath(const bool on_path)
 {
-  if (_curr_node == nullptr) {
+  if (_optimal_node == nullptr) {
     return;
   }
-  Node* temp_node = _curr_node;
+  Node* temp_node = _optimal_node;
   do {
     temp_node->set_on_path(on_path);
     temp_node = temp_node->get_parent_node();
-  } while (!temp_node->isStart());
+  } while (!temp_node->isStartPoint());
 }
 
 void Model::printGridMap()
@@ -460,14 +484,14 @@ void Model::printNode(Node& node)
           exit(1);
       }
       break;
-    case NodeType::kOObs:
-      printf("\33[40m[OO.OO+OO.OO]\033[0m");
+    case NodeType::kOmniObs:
+      printf("\33[40m[O_OBS+O_OBS]\033[0m");
       break;
     case NodeType::kHObs:
-      printf("\33[40m[HH.HH+HH.HH]\033[0m");
+      printf("\33[40m[H_OBS+H_OBS]\033[0m");
       break;
     case NodeType::kVObs:
-      printf("\33[40m[VV.VV+VV.VV]\033[0m");
+      printf("\33[40m[V_OBS+V_OBS]\033[0m");
       break;
     case NodeType::kStart:
       printf("\33[42m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
@@ -483,9 +507,8 @@ void Model::printNode(Node& node)
 
 void Model::reportResult()
 {
-  if (_curr_node->isEnd()) {
-    std::cout << "[AStar Info] Reached the end node!! Path cost:"
-              << _curr_node->get_total_cost();
+  if (_optimal_node->isEndPoint()) {
+    std::cout << "[AStar Info] Reached the end node!! Path cost:" << _optimal_node->get_total_cost();
   } else {
     std::cout << "[AStar Info] Can't reach the end node!!";
   }
@@ -496,15 +519,14 @@ std::vector<Coordinate> Model::getPathCoord()
 {
   std::vector<Coordinate> path_coord;
 
-  if (_curr_node == nullptr || !_curr_node->isEnd()) {
+  if (_optimal_node == nullptr || !_optimal_node->isEndPoint()) {
     return path_coord;
   }
 
   path_coord.push_back(_end_node->get_coord());
-  Direction curr_direction
-      = getDirection(_curr_node, _curr_node->get_parent_node());
+  Direction curr_direction = getDirection(_optimal_node, _optimal_node->get_parent_node());
 
-  Node* temp_node = _curr_node;
+  Node* temp_node = _optimal_node;
   do {
     Direction direction = getDirection(temp_node, temp_node->get_parent_node());
     if (curr_direction != direction) {
@@ -513,7 +535,7 @@ std::vector<Coordinate> Model::getPathCoord()
     }
     temp_node = temp_node->get_parent_node();
 
-  } while (!temp_node->isStart());
+  } while (!temp_node->isStartPoint());
 
   path_coord.push_back(_start_node->get_coord());
 
