@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-17 22:52:12
+ * @LastEditTime: 2021-09-18 13:04:01
  * @FilePath: /AStar/include/GridMap.h
  */
 
@@ -76,6 +76,7 @@ class GridMap
 template <typename T>
 inline void GridMap<T>::init(int x_size, int y_size)
 {
+  freeArray(_array);
   _x_size = x_size;
   _y_size = y_size;
   _array = initArray(x_size, y_size);
@@ -123,6 +124,7 @@ inline bool GridMap<T>::isEmpty()
 {
   return _x_size == 0 || _y_size == 0;
 }
+
 }  // namespace astar
 
 #endif  // ASTAR_INCLUDE_MAT_H_
