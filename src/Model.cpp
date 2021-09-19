@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-17 23:29:19
+ * @LastEditTime: 2021-09-19 20:11:55
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -294,7 +294,7 @@ void Model::initOffsetList()
     if (y_offset != 0) {
       _offset_list.emplace_back(0, y_offset);
     }
-    if (x_offset != 0 && y_offset != 0) {
+    if (_config.isRoutingDiagonal() && x_offset != 0 && y_offset != 0) {
       _offset_list.emplace_back(x_offset, y_offset);
     }
   }
