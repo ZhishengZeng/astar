@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-18 13:04:01
+ * @LastEditTime: 2021-09-27 15:00:09
  * @FilePath: /AStar/include/GridMap.h
  */
 
@@ -19,6 +19,7 @@ class GridMap
 {
  public:
   GridMap() {}
+  GridMap(int x_size, int y_size) { init(x_size, y_size); }
   GridMap(const GridMap& other)
   {
     _x_size = other._x_size;
@@ -27,8 +28,8 @@ class GridMap
   }
   GridMap(GridMap&& other)
   {
-    _x_size = other._x_size;
-    _y_size = other._y_size;
+    _x_size = std::move(other._x_size);
+    _y_size = std::move(other._y_size);
     _array = other._array;
     other._array = nullptr;
   }
@@ -44,8 +45,8 @@ class GridMap
   GridMap& operator=(GridMap&& other)
   {
     freeArray(_array);
-    _x_size = other._x_size;
-    _y_size = other._y_size;
+    _x_size = std::move(other._x_size);
+    _y_size = std::move(other._y_size);
     _array = other._array;
     other._array = nullptr;
     return (*this);
