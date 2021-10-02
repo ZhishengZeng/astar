@@ -27,6 +27,9 @@ ADD_EXECUTABLE(random_astar ${PROJECT_SOURCE_DIR}/tests/random.cpp)
 TARGET_LINK_LIBRARIES(simple_astar astar)
 TARGET_LINK_LIBRARIES(random_astar astar)
 
+ADD_EXECUTABLE(test ${PROJECT_SOURCE_DIR}/tests/test.cpp)
+
+
 ADD_EXECUTABLE(test_astar ${PROJECT_SOURCE_DIR}/tests/gtest.cpp)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/third_party/googletest)
 TARGET_LINK_LIBRARIES(test_astar libgtest.a libgtest_main.a pthread astar)

@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-27 15:00:09
+ * @LastEditTime: 2021-10-02 21:26:24
  * @FilePath: /AStar/include/GridMap.h
  */
 
@@ -18,7 +18,7 @@ template <typename T>
 class GridMap
 {
  public:
-  GridMap() {}
+  explicit GridMap() {}
   GridMap(int x_size, int y_size) { init(x_size, y_size); }
   GridMap(const GridMap& other)
   {
@@ -67,6 +67,7 @@ class GridMap
   T** cloneArray(T** other_array, int x_size, int y_size);
   void freeArray(T** array);
   bool isEmpty();
+  bool inScope(int x, int y);
 
  private:
   int _x_size = 0;
@@ -124,6 +125,12 @@ template <typename T>
 inline bool GridMap<T>::isEmpty()
 {
   return _x_size == 0 || _y_size == 0;
+}
+
+template <typename T>
+inline bool GridMap<T>::inScope(int x, int y)
+{
+  return 0 <= x && x < _x_size && 0 <= y && y < _y_size;
 }
 
 }  // namespace astar

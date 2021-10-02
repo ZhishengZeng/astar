@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-19 20:11:55
+ * @LastEditTime: 2021-10-02 21:33:11
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -109,13 +109,15 @@ void Model::disableTurningBack()
 /**
  * @description: Returns multiple key points on the path
  * eg:
- *                            e(end)
+ *                        (end_point)
+ *                            e
  *                            │
  *                            │
- *                    x2 ──── x3          return {s x1 x2 x3 e}
- *                    │
- *                    │
- *    (start)s ────── x1
+ *                   x2 ──── x3          return {s x1 x2 x3 e}
+ *                   │
+ *                   │
+ *         s ────── x1
+ *   (start_point)
  *
  * @param {Coordinate} start_coord
  * @param {Coordinate} end_coord
