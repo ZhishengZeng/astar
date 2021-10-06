@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-10-02 21:33:11
+ * @LastEditTime: 2021-10-06 16:01:45
  * @FilePath: /AStar/src/Model.cpp
  */
 #include "Model.h"
@@ -36,10 +36,12 @@ void Model::addNodeCost(const Coordinate& coord, const double cost)
 }
 
 /**
- * @description:Add obstacle node
- *              Horizontal-OBS type_flag='H'
- *              Vertical-OBS type_flag='V'
- *              Omnidirectional-OBS type_flag='O'
+ * @description: Add obstacle node
+ *
+ *               Horizontal-OBS        type_flag='H'
+ *               Vertical-OBS          type_flag='V'
+ *               Omnidirectional-OBS   type_flag='O'
+ *
  * @param {Coordinate} coord
  * @param {char} type_flag
  * @return {*}
@@ -64,6 +66,21 @@ void Model::addObstacle(const Coordinate& coord, const char type_flag)
   }
   std::vector<std::pair<Coordinate, NodeType>>& coord_type_list = _config.get_coord_type_list();
   coord_type_list.emplace_back(coord, type);
+}
+
+/**
+ * @description: log verbose
+ *
+ *               0    silence(default)
+ *               1    report wire length only
+ *               2    report wire length & plot routing info
+ *
+ * @param {int} level
+ * @return {*}
+ */
+void Model::setLogVerbose(int level = 0)
+{
+  _config.set_log_verbose(level);
 }
 
 /**
@@ -108,7 +125,7 @@ void Model::disableTurningBack()
 
 /**
  * @description: Returns multiple key points on the path
- * eg:
+ *
  *                        (end_point)
  *                            e
  *                            │
@@ -140,10 +157,15 @@ std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coor
       break;
     }
   }
-#if SHOWRESULT
-  showResult();
-#endif
-  reportResult();
+
+  int log_verbose = _config.get_log_verbose();
+  if (log_verbose > 0) {
+    reportResult();
+  }
+  if (log_verbose > 1) {
+    showResult();
+  }
+
   return getPathCoord();
 }
 
