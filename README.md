@@ -1,4 +1,4 @@
-# AStar
+# astar
 
 ## Dependencies
 
@@ -11,8 +11,8 @@ cmake
 ## Get Started
 
 ```
-git clone https://github.com/ZhishengZeng/AStar.git
-cd AStar
+git clone https://github.com/ZhishengZeng/astar.git
+cd astar
 mkdir build && cd build
 cmake ..
 make -j64

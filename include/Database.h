@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-09-17 12:56:38
- * @FilePath: /AStar/include/Database.h
+ * @FilePath: /astar/include/Database.h
  */
 #ifndef ASTAR_INCLUDE_DATABASE_H_
 #define ASTAR_INCLUDE_DATABASE_H_

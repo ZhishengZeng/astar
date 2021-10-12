@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-09-15 14:10:49
- * @FilePath: /AStar/src/Util.cpp
+ * @FilePath: /astar/src/Util.cpp
  */
 
 #include "Util.h"

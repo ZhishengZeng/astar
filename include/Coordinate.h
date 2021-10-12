@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-09-15 14:10:52
- * @FilePath: /AStar/include/Coordinate.h
+ * @FilePath: /astar/include/Coordinate.h
  */
 
 #ifndef ASTAR_INCLUDE_COORDINATE_H_

@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-09-15 14:10:50
- * @FilePath: /AStar/include/Util.h
+ * @FilePath: /astar/include/Util.h
  */
 
 #ifndef ASTAR_INCLUDE_UTIL_H_

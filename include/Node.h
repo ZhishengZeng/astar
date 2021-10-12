@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-09-17 15:02:48
- * @FilePath: /AStar/include/Node.h
+ * @FilePath: /astar/include/Node.h
  */
 
 #ifndef ASTAR_INCLUDE_NODE_H_

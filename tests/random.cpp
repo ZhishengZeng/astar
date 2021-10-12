@@ -3,8 +3,8 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-17 23:21:24
- * @FilePath: /AStar/tests/random.cpp
+ * @LastEditTime: 2021-10-12 21:53:52
+ * @FilePath: /astar/tests/random.cpp
  */
 
 #include <iostream>
@@ -32,7 +32,7 @@ int main()
     std::vector<astar::Coordinate> coord_list(coord_set.begin(), coord_set.end());
 
     end_time = astar::Util::microtime();
-    std::cout << "[AStar Info] Create example time:" << (end_time - start_time) << std::endl;
+    std::cout << "[astar Info] Create example time:" << (end_time - start_time) << std::endl;
     start_time = end_time;
 
     astar::Model astar_model;
@@ -41,18 +41,19 @@ int main()
     std::vector<astar::Coordinate> obs_coord_list;
     for (size_t i = 1; i < coord_list.size() - 1; i++) {
       int select = rand() % 3;
-      char type_flag = 'O';
+      astar::NodeType type;
+      type = astar::NodeType::kOmniObs;
       if (select == 0) {
-        type_flag = 'H';
+        type = astar::NodeType::kHObs;
       } else if (select == 1) {
-        type_flag = 'V';
+        type = astar::NodeType::kVObs;
       }
-      astar_model.addObstacle(coord_list[i], type_flag);
+      astar_model.addObstacle(coord_list[i], type);
     }
     std::vector<astar::Coordinate> path = astar_model.getPath(coord_list.front(), coord_list.back());
 
     end_time = astar::Util::microtime();
-    std::cout << "[AStar Info] Run time:" << (end_time - start_time) << std::endl;
+    std::cout << "[astar Info] Run time:" << (end_time - start_time) << std::endl;
 
     if (path.size() == 0) {
       exit(1);

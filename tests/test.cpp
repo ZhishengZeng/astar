@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-09-28 16:11:53
- * @FilePath: /AStar/tests/test.cpp
+ * @FilePath: /astar/tests/test.cpp
  */
 #include <iostream>
 

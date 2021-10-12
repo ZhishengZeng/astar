@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-10-06 15:43:22
- * @FilePath: /AStar/include/Config.h
+ * @FilePath: /astar/include/Config.h
  */
 #ifndef ASTAR_INCLUDE_CONFIG_H_
 #define ASTAR_INCLUDE_CONFIG_H_

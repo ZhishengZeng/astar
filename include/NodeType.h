@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-09-17 15:20:33
- * @FilePath: /AStar/include/NodeType.h
+ * @FilePath: /astar/include/NodeType.h
  */
 #ifndef ASTAR_INCLUDE_NODETYPE_H_
 #define ASTAR_INCLUDE_NODETYPE_H_

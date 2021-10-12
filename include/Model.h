@@ -3,8 +3,8 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-10-06 15:50:39
- * @FilePath: /AStar/include/Model.h
+ * @LastEditTime: 2021-10-12 21:52:03
+ * @FilePath: /astar/include/Model.h
  */
 
 #ifndef ASTAR_INCLUDE_MODEL_H_
@@ -39,7 +39,7 @@ class Model
 
   void buildMap(int x_size, int y_size);
   void addNodeCost(const Coordinate& coord, const double cost);
-  void addObstacle(const Coordinate& coord, const char type);
+  void addObstacle(const Coordinate& coord, NodeType type);
   void setLogVerbose(int level);
   void enableDiagonalRouting();
   void disableDiagonalRouting();

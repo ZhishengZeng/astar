@@ -3,8 +3,8 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-10-06 16:01:45
- * @FilePath: /AStar/src/Model.cpp
+ * @LastEditTime: 2021-10-12 21:51:28
+ * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
 
@@ -46,24 +46,8 @@ void Model::addNodeCost(const Coordinate& coord, const double cost)
  * @param {char} type_flag
  * @return {*}
  */
-void Model::addObstacle(const Coordinate& coord, const char type_flag)
+void Model::addObstacle(const Coordinate& coord, NodeType type)
 {
-  NodeType type;
-  switch (type_flag) {
-    case 'H':
-      type = NodeType::kHObs;
-      break;
-    case 'V':
-      type = NodeType::kVObs;
-      break;
-    case 'O':
-      type = NodeType::kOmniObs;
-      break;
-    default:
-      std::cout << "[Error] NodeType is not OBS!" << std::endl;
-      exit(1);
-      break;
-  }
   std::vector<std::pair<Coordinate, NodeType>>& coord_type_list = _config.get_coord_type_list();
   coord_type_list.emplace_back(coord, type);
 }
@@ -434,7 +418,7 @@ void Model::updateParentByOptimalNode(Node* node)
 void Model::showResult()
 {
   if (_grid_map.get_x_size() > 50 || _grid_map.get_y_size() > 50) {
-    std::cout << "[AStar Warning] Plot large map(larger than 50x50) , skipping..." << std::endl;
+    std::cout << "[astar Warning] Plot large map(larger than 50x50) , skipping..." << std::endl;
     return;
   }
   setOnPath(true);
@@ -488,7 +472,7 @@ void Model::printNode(Node& node)
           }
           break;
         default:
-          std::cout << "[AStar Error] Node type not recognized!" << std::endl;
+          std::cout << "[astar Error] Node type not recognized!" << std::endl;
           exit(1);
       }
       break;
@@ -508,7 +492,7 @@ void Model::printNode(Node& node)
       printf("\33[44m[%05.2lf+%05.2lf]\033[0m", curr_cost, est_cost);
       break;
     default:
-      std::cout << "[AStar Error] Node type not recognized!" << std::endl;
+      std::cout << "[astar Error] Node type not recognized!" << std::endl;
       exit(1);
   }
 }
@@ -516,9 +500,9 @@ void Model::printNode(Node& node)
 void Model::reportResult()
 {
   if (_optimal_node->isEndPoint()) {
-    std::cout << "[AStar Info] Reached the end node!! Path cost:" << _optimal_node->get_total_cost();
+    std::cout << "[astar Info] Reached the end node!! Path cost:" << _optimal_node->get_total_cost();
   } else {
-    std::cout << "[AStar Info] Can't reach the end node!!";
+    std::cout << "[astar Info] Can't reach the end node!!";
   }
   std::cout << std::endl;
 }

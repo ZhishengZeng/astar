@@ -4,7 +4,7 @@
  * @Description:
  * @LastEditors: Zhisheng Zeng
  * @LastEditTime: 2021-09-17 12:04:23
- * @FilePath: /AStar/include/NodeState.h
+ * @FilePath: /astar/include/NodeState.h
  */
 #ifndef ASTAR_INCLUDE_NODESTATE_H_
 #define ASTAR_INCLUDE_NODESTATE_H_
