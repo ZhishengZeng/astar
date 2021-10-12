@@ -3,9 +3,11 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-10-12 21:53:52
- * @FilePath: /astar/tests/random.cpp
+ * @LastEditTime: 2021-10-12 22:11:08
+ * @FilePath: /astar/tests/random_case_run.cpp
  */
+
+#include <unistd.h>
 
 #include <iostream>
 #include <list>
@@ -16,9 +18,10 @@
 #include "Util.h"
 int main()
 {
-  int n = 10000;
+  int n = 5;
 
   while (n--) {
+    std::cout << "\n**************************************" << std::endl;
     double start_time, end_time;
     start_time = astar::Util::microtime();
 
@@ -36,6 +39,7 @@ int main()
     start_time = end_time;
 
     astar::Model astar_model;
+    astar_model.setLogVerbose(2);
     astar_model.buildMap(x_size, y_size);
 
     std::vector<astar::Coordinate> obs_coord_list;
@@ -54,10 +58,8 @@ int main()
 
     end_time = astar::Util::microtime();
     std::cout << "[astar Info] Run time:" << (end_time - start_time) << std::endl;
-
-    if (path.size() == 0) {
-      exit(1);
-    }
+    std::cout << "**************************************" << std::endl;
+    sleep(1);
   }
   return 0;
 }

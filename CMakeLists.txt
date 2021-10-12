@@ -22,17 +22,13 @@ SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 # SET(CMAKE_BUILD_TYPE "Debug")
 # SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g3 -ggdb")
 
-ADD_EXECUTABLE(simple_astar ${PROJECT_SOURCE_DIR}/tests/simple.cpp)
-ADD_EXECUTABLE(random_astar ${PROJECT_SOURCE_DIR}/tests/random.cpp)
-TARGET_LINK_LIBRARIES(simple_astar astar)
-TARGET_LINK_LIBRARIES(random_astar astar)
+ADD_EXECUTABLE(random_case_run ${PROJECT_SOURCE_DIR}/tests/random_case_run.cpp)
+TARGET_LINK_LIBRARIES(random_case_run astar)
 
-ADD_EXECUTABLE(test ${PROJECT_SOURCE_DIR}/tests/test.cpp)
-
-
-ADD_EXECUTABLE(test_astar ${PROJECT_SOURCE_DIR}/tests/gtest.cpp)
+ADD_EXECUTABLE(test_astar ${PROJECT_SOURCE_DIR}/tests/test_astar.cpp)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/third_party/googletest)
 TARGET_LINK_LIBRARIES(test_astar libgtest.a libgtest_main.a pthread astar)
+
 
 
 
