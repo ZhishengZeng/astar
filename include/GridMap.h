@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-10-12 21:49:34
+ * @LastEditTime: 2021-10-29 21:13:15
  * @FilePath: /astar/include/GridMap.h
  */
 
@@ -12,6 +12,7 @@
 #include <malloc.h>
 
 #include <cassert>
+
 namespace astar {
 
 template <typename T>
@@ -33,7 +34,7 @@ class GridMap
     _array = other._array;
     other._array = nullptr;
   }
-  ~GridMap() { freeArray(_array); }
+  ~GridMap() { free(); }
   GridMap& operator=(const GridMap& other)
   {
     freeArray(_array);
@@ -63,9 +64,7 @@ class GridMap
 
   // function
   void init(int x_size = 0, int y_size = 0);
-  T** initArray(int x_size, int y_size);
-  T** cloneArray(T** other_array, int x_size, int y_size);
-  void freeArray(T** array);
+  void free();
   bool isEmpty();
   bool inScope(int x, int y);
 
@@ -73,6 +72,10 @@ class GridMap
   int _x_size = 0;
   int _y_size = 0;
   T** _array = nullptr;
+
+  T** initArray(int x_size, int y_size);
+  T** cloneArray(T** other_array, int x_size, int y_size);
+  void freeArray(T** array);
 };
 
 template <typename T>
@@ -122,6 +125,14 @@ inline void GridMap<T>::freeArray(T** array)
 }
 
 template <typename T>
+void GridMap<T>::free()
+{
+  _x_size = 0;
+  _y_size = 0;
+  freeArray(_array);
+}
+
+template <typename T>
 inline bool GridMap<T>::isEmpty()
 {
   return _x_size == 0 || _y_size == 0;
@@ -135,4 +146,4 @@ inline bool GridMap<T>::inScope(int x, int y)
 
 }  // namespace astar
 
-#endif  // ASTAR_INCLUDE_MAT_H_
+#endif  // ISR_GRIDMAP_H_
