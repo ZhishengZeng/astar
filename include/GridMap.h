@@ -20,7 +20,7 @@ class GridMap
 {
  public:
   explicit GridMap() {}
-  GridMap(int x_size, int y_size) { init(x_size, y_size); }
+  explicit GridMap(int x_size, int y_size) { init(x_size, y_size); }
   GridMap(const GridMap& other)
   {
     _x_size = other._x_size;
@@ -72,7 +72,7 @@ class GridMap
   int _x_size = 0;
   int _y_size = 0;
   T** _array = nullptr;
-
+  // function
   T** initArray(int x_size, int y_size);
   T** cloneArray(T** other_array, int x_size, int y_size);
   void freeArray(T** array);
@@ -85,6 +85,26 @@ inline void GridMap<T>::init(int x_size, int y_size)
   _x_size = x_size;
   _y_size = y_size;
   _array = initArray(x_size, y_size);
+}
+
+template <typename T>
+void GridMap<T>::free()
+{
+  _x_size = 0;
+  _y_size = 0;
+  freeArray(_array);
+}
+
+template <typename T>
+inline bool GridMap<T>::isEmpty()
+{
+  return _x_size == 0 || _y_size == 0;
+}
+
+template <typename T>
+inline bool GridMap<T>::inScope(int x, int y)
+{
+  return 0 <= x && x < _x_size && 0 <= y && y < _y_size;
 }
 
 template <typename T>
@@ -122,26 +142,6 @@ inline void GridMap<T>::freeArray(T** array)
   }
   delete[] array;
   array = nullptr;
-}
-
-template <typename T>
-void GridMap<T>::free()
-{
-  _x_size = 0;
-  _y_size = 0;
-  freeArray(_array);
-}
-
-template <typename T>
-inline bool GridMap<T>::isEmpty()
-{
-  return _x_size == 0 || _y_size == 0;
-}
-
-template <typename T>
-inline bool GridMap<T>::inScope(int x, int y)
-{
-  return 0 <= x && x < _x_size && 0 <= y && y < _y_size;
 }
 
 }  // namespace astar
