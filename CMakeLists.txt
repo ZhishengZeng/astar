@@ -17,10 +17,10 @@ ${PROJECT_SOURCE_DIR}/src/Util.cpp
 
 # ADD_COMPILE_OPTIONS("-fsanitize=address")
 # LINK_LIBRARIES("-fsanitize=address")
-SET(CMAKE_BUILD_TYPE "Release")
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
-# SET(CMAKE_BUILD_TYPE "Debug")
-# SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g3 -ggdb")
+# SET(CMAKE_BUILD_TYPE "Release")
+# SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+SET(CMAKE_BUILD_TYPE "Debug")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g3 -ggdb")
 
 ADD_EXECUTABLE(random_case_run ${PROJECT_SOURCE_DIR}/tests/random_case_run.cpp)
 TARGET_LINK_LIBRARIES(random_case_run astar)

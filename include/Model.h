@@ -2,8 +2,8 @@
  * @Author: Zhisheng Zeng
  * @Date: 2021-09-11 11:49:07
  * @Description:
- * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-10-12 21:52:03
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-12-03 21:18:27
  * @FilePath: /astar/include/Model.h
  */
 
@@ -17,6 +17,7 @@
 #include <list>
 #include <map>
 #include <queue>
+#include <set>
 #include <vector>
 
 #include "Config.h"
@@ -34,15 +35,13 @@ class Model
   {
     _start_node = nullptr;
     _end_node = nullptr;
-    _optimal_node = nullptr;
+    _path_head_node = nullptr;
   }
 
   void buildMap(int x_size, int y_size);
   void addNodeCost(const Coordinate& coord, const double cost);
-  void addObstacle(const Coordinate& coord, NodeType type);
+  void addObstacle(const Coordinate& coord, ObsType type);
   void setLogVerbose(int level);
-  void enableDiagonalRouting();
-  void disableDiagonalRouting();
   void enableTurningBack();
   void disableTurningBack();
   std::vector<Coordinate> getPath(const Coordinate& start_coord, const Coordinate& end_coord);
@@ -51,10 +50,11 @@ class Model
   Config _config;
   // database
   GridMap<Node> _grid_map;
+  std::priority_queue<Node*, std::vector<Node*>, cmpNodeCost> _open_queue;
+
   Node* _start_node = nullptr;
   Node* _end_node = nullptr;
-  Node* _optimal_node = nullptr;
-  std::priority_queue<Node*, std::vector<Node*>, cmpNodeCost> _search_queue;
+  Node* _path_head_node = nullptr;
   // object
   double _min_node_cost = 0;
   std::vector<Coordinate> _offset_list;
@@ -64,25 +64,18 @@ class Model
   void addStartNodeToGridMap(const Coordinate& coord);
   void addEndNodeToGridMap(const Coordinate& coord);
   void addCostToGridMap();
+  void legalizeCost();
   void addObsToGridMap();
-  Node* setNode(const Coordinate& coord, const NodeType& node_type);
   void initStartNode();
   void updateEstCost(Node* node);
   double caculateEstCost(Node* a, Node* b);
-  void addNodeToSearchQueue(Node* node);
   void initOffsetList();
-  void updateOptimalNode();
-  void expandSearchQueue();
-  std::vector<Node*> getNeighborsByOptimalNode();
-  bool checkCoord(const int x, const int y);
-  bool checkNode(const int x, const int y);
+  void updatePathHead();
+  void expandSearching();
+  std::vector<Node*> getNeighborsByPathHead();
+  bool isInvaild(Node* node);
   bool needReplaceParentNode(Node* node);
-  double getWalkingCost(Node* node1, Node* node2);
-  void updateParentByOptimalNode(Node* node);
-  void showResult();
-  void setOnPath(const bool on_path);
-  void printGridMap();
-  void printNode(Node& node);
+  void updateParentByPathHead(Node* node);
   void reportResult();
   std::vector<Coordinate> getPathCoord();
   Direction getDirection(Node* start_node, Node* end_node);

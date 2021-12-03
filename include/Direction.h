@@ -2,8 +2,8 @@
  * @Author: Zhisheng Zeng
  * @Date: 2021-09-05 21:50:09
  * @Description:
- * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 14:10:51
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-12-03 14:25:44
  * @FilePath: /astar/include/Direction.h
  */
 
@@ -14,9 +14,8 @@ namespace astar {
 enum class Direction
 {
   kNone = 0,
-  kHorizontal = 1,
-  kVertical = 2,
-  kDiagonal = 3
+  kH= 1,
+  kV = 2
 };
 
 }  // namespace astar

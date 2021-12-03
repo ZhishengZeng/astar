@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "Coordinate.h"
-#include "NodeType.h"
+#include "ObsType.h"
 namespace astar {
 
 class Database
@@ -21,7 +21,7 @@ class Database
   int _map_x_size;
   int _map_y_size;
   std::vector<std::pair<Coordinate, double>> _coord_cost_list;
-  std::vector<std::pair<Coordinate, NodeType>> _coord_type_list;
+  std::vector<std::pair<Coordinate, ObsType>> _coord_type_list;
   bool _turning_back = true;
   bool _routing_diagonal = false;
 
@@ -33,7 +33,7 @@ class Database
   int get_map_x_size() const { return _map_x_size; }
   int get_map_y_size() const { return _map_y_size; }
   std::vector<std::pair<Coordinate, double>>& get_coord_cost_list() { return _coord_cost_list; }
-  std::vector<std::pair<Coordinate, NodeType>>& get_coord_type_list() { return _coord_type_list; }
+  std::vector<std::pair<Coordinate, ObsType>>& get_coord_type_list() { return _coord_type_list; }
   bool get_turning_back() const { return _turning_back; }
   bool get_routing_diagonal() const { return _routing_diagonal; }
 
