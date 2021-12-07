@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 11:16:22
+ * @LastEditTime: 2021-12-07 14:00:54
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -48,12 +48,12 @@ void Model::addNodeCost(const Coordinate& coord, const double cost)
  */
 void Model::addObstacle(const Coordinate& coord, ObsType type)
 {
-  std::map<Coordinate, std::vector<ObsType>, cmpCoordinate>& coord_obs_map = _config.get_coord_obs_map();
+  std::map<Coordinate, std::set<ObsType>, cmpCoordinate>& coord_obs_map = _config.get_coord_obs_map();
 
   if (coord_obs_map.find(coord) != coord_obs_map.end()) {
-    coord_obs_map[coord].push_back(type);
+    coord_obs_map[coord].insert(type);
   } else {
-    coord_obs_map.insert(std::map<Coordinate, std::vector<ObsType>>::value_type(coord, {type}));
+    coord_obs_map.insert(std::map<Coordinate, std::set<ObsType>>::value_type(coord, {type}));
   }
 }
 
@@ -196,9 +196,9 @@ void Model::legalizeCost()
 
 void Model::addObsToGridMap()
 {
-  std::map<Coordinate, std::vector<ObsType>, cmpCoordinate> coord_obs_map = _config.get_coord_obs_map();
-  for (auto [coord, obs_list] : coord_obs_map) {
-    _grid_map[coord.get_x()][coord.get_y()].set_obs_list(obs_list);
+  std::map<Coordinate, std::set<ObsType>, cmpCoordinate> coord_obs_map = _config.get_coord_obs_map();
+  for (auto [coord, obs_set] : coord_obs_map) {
+    _grid_map[coord.get_x()][coord.get_y()].set_obs_set(obs_set);
   }
 }
 
@@ -261,9 +261,10 @@ void Model::expandSearching()
   std::vector<Node*> neighbor_node_list = getNeighborsByPathHead();
   for (size_t i = 0; i < neighbor_node_list.size(); i++) {
     Node* neighbor_node = neighbor_node_list[i];
-    if (neighbor_node->isClose() || invaild(neighbor_node)) {
+    if (neighbor_node->isClose() || (!touchByHead(neighbor_node))) {
       continue;
-    } else if (neighbor_node->isOpen()) {
+    }
+    if (neighbor_node->isOpen()) {
       if (needReplaceParentNode(neighbor_node)) {
         updateParentByPathHead(neighbor_node);
       }
@@ -298,9 +299,44 @@ std::vector<Node*> Model::getNeighborsByPathHead()
   return neighbor_node_list;
 }
 
-bool Model::invaild(Node* node)
+bool Model::touchByHead(Node* node)
 {
-  return false;
+  Coordinate& head_coord = _path_head_node->get_coord();
+  Coordinate& to_coord = node->get_coord();
+
+  int head_x = head_coord.get_x();
+  int head_y = head_coord.get_y();
+  int to_x = to_coord.get_x();
+  int to_y = to_coord.get_y();
+
+  if (head_x < to_x) {
+    // left to right
+    if (Util::exist(_path_head_node->get_obs_set(), ObsType::kHRightObs)
+        || Util::exist(node->get_obs_set(), ObsType::kHLeftObs)) {
+      return false;
+    }
+  } else if (head_x > to_x) {
+    if (Util::exist(_path_head_node->get_obs_set(), ObsType::kHLeftObs)
+        || Util::exist(node->get_obs_set(), ObsType::kHRightObs)) {
+      return false;
+    }
+  }
+
+  if (head_y < to_y) {
+    // down to up
+    if (Util::exist(_path_head_node->get_obs_set(), ObsType::kVTopObs)
+        || Util::exist(node->get_obs_set(), ObsType::kVBottomObs)) {
+      return false;
+    }
+  } else if (head_y > to_y) {
+    // up to down
+    if (Util::exist(_path_head_node->get_obs_set(), ObsType::kVBottomObs)
+        || Util::exist(node->get_obs_set(), ObsType::kVTopObs)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 bool Model::needReplaceParentNode(Node* node)
@@ -376,9 +412,11 @@ void Model::printResult()
         gds_file << x * factor << " : " << y * factor << std::endl;
         gds_file << "ENDEL" << std::endl;
         // obs
-        std::vector<ObsType>& obs_list = node.get_obs_list();
-        for (size_t i = 0; i < obs_list.size(); i++) {
-          ObsType& obs_type = obs_list[i];
+        std::set<ObsType>& obs_set = node.get_obs_set();
+        for (const ObsType& obs_type : obs_set) {
+          if (obs_type == ObsType::kNone) {
+            continue;
+          }
           gds_file << "PATH" << std::endl;
           gds_file << "LAYER " << obs_layer << std::endl;
           gds_file << "DATATYPE 0" << std::endl;
@@ -431,7 +469,6 @@ void Model::printResult()
       gds_file << coord.get_x() * factor << " : " << coord.get_y() * factor << std::endl;
       gds_file << "ENDEL" << std::endl;
     }
-
     gds_file << "ENDSTR" << std::endl;
     gds_file << "ENDLIB" << std::endl;
     gds_file.close();
@@ -448,17 +485,13 @@ std::vector<Coordinate> Model::getCoordPath()
 
   coord_path.push_back(_end_node->get_coord());
 
-  Node* temp_node = nullptr;
-  if (_path_head_node == _end_node) {
-    temp_node = _path_head_node->get_parent_node();
-  } else {
-    temp_node = _path_head_node;
-  }
+  Node* temp_node = _path_head_node;
 
   while (temp_node != _start_node) {
     coord_path.push_back(temp_node->get_coord());
     temp_node = temp_node->get_parent_node();
   }
+  coord_path.push_back(_start_node->get_coord());
   coord_path.push_back(_start_node->get_coord());
 
   for (size_t i = 0, j = (coord_path.size() - 1); i < j; i++, j--) {

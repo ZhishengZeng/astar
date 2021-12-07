@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-06 15:33:44
+ * @LastEditTime: 2021-12-07 14:14:35
  * @FilePath: /astar/tests/test_astar.cpp
  */
 
@@ -12,11 +12,108 @@
 
 namespace {
 
-TEST(RoutingTest, Reached)
+TEST(RoutingTest, Reached1)
 {
   astar::Model astar_model;
-  astar_model.buildMap(4, 3);
-  EXPECT_TRUE(astar_model.getPath({0, 0}, {3, 2}).size());
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  EXPECT_TRUE(astar_model.getPath({0, 0}, {9, 0}).size());
+}
+
+TEST(RoutingTest, Reached2)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  EXPECT_TRUE(astar_model.getPath({9, 0}, {0, 0}).size());
+}
+
+TEST(RoutingTest, Reached3)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.addObstacle({3, 0}, astar::ObsType::kVTopObs);
+  astar_model.addObstacle({3, 0}, astar::ObsType::kVBottomObs);
+  astar_model.addObstacle({5, 0}, astar::ObsType::kVTopObs);
+  astar_model.addObstacle({5, 0}, astar::ObsType::kVBottomObs);
+  EXPECT_TRUE(astar_model.getPath({0, 0}, {9, 0}).size());
+}
+
+TEST(RoutingTest, Reached4)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.addObstacle({3, 0}, astar::ObsType::kVTopObs);
+  astar_model.addObstacle({3, 0}, astar::ObsType::kVBottomObs);
+  astar_model.addObstacle({5, 0}, astar::ObsType::kVTopObs);
+  astar_model.addObstacle({5, 0}, astar::ObsType::kVBottomObs);
+  EXPECT_TRUE(astar_model.getPath({9, 0}, {0, 0}).size());
+}
+
+TEST(RoutingTest, Reached5)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.addObstacle({0, 0}, astar::ObsType::kVBottomObs);
+  astar_model.addObstacle({0, 0}, astar::ObsType::kVTopObs);
+  EXPECT_TRUE(astar_model.getPath({0, 0}, {9, 0}).size());
+}
+
+TEST(RoutingTest, Reached6)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.addObstacle({0, 0}, astar::ObsType::kVBottomObs);
+  astar_model.addObstacle({0, 0}, astar::ObsType::kVTopObs);
+  EXPECT_TRUE(astar_model.getPath({9, 0}, {0, 0}).size());
+}
+
+TEST(RoutingTest, NoWhere1)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.addObstacle({3, 0}, astar::ObsType::kHLeftObs);
+  astar_model.addObstacle({3, 0}, astar::ObsType::kHRightObs);
+  astar_model.addObstacle({5, 0}, astar::ObsType::kHLeftObs);
+  astar_model.addObstacle({5, 0}, astar::ObsType::kHRightObs);
+  EXPECT_FALSE(astar_model.getPath({0, 0}, {9, 0}).size());
+}
+
+TEST(RoutingTest, NoWhere2)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.addObstacle({3, 0}, astar::ObsType::kHLeftObs);
+  astar_model.addObstacle({3, 0}, astar::ObsType::kHRightObs);
+  astar_model.addObstacle({5, 0}, astar::ObsType::kHLeftObs);
+  astar_model.addObstacle({5, 0}, astar::ObsType::kHRightObs);
+  EXPECT_FALSE(astar_model.getPath({9, 0}, {0, 0}).size());
+}
+
+TEST(RoutingTest, NoWhere3)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.addObstacle({0, 0}, astar::ObsType::kHLeftObs);
+  astar_model.addObstacle({0, 0}, astar::ObsType::kHRightObs);
+  EXPECT_FALSE(astar_model.getPath({0, 0}, {9, 0}).size());
+}
+
+TEST(RoutingTest, NoWhere4)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(10, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.addObstacle({0, 0}, astar::ObsType::kHLeftObs);
+  astar_model.addObstacle({0, 0}, astar::ObsType::kHRightObs);
+  EXPECT_FALSE(astar_model.getPath({9, 0}, {0, 0}).size());
 }
 
 }  // namespace

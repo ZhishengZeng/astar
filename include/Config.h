@@ -2,8 +2,8 @@
  * @Author: Zhisheng Zeng
  * @Date: 2021-09-17 11:51:30
  * @Description:
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-12-03 21:16:19
+ * @LastEditors: Zhisheng Zeng
+ * @LastEditTime: 2021-12-07 13:00:33
  * @FilePath: /astar/include/Config.h
  */
 #ifndef ASTAR_INCLUDE_CONFIG_H_
@@ -21,7 +21,7 @@ class Config
   int _map_x_size;
   int _map_y_size;
   std::map<Coordinate, double, cmpCoordinate> _coord_cost_map;
-  std::map<Coordinate, std::vector<ObsType>, cmpCoordinate> _coord_obs_map;
+  std::map<Coordinate, std::set<ObsType>, cmpCoordinate> _coord_obs_map;
   int _log_verbose = 0;
   bool _turning_back = true;
 
@@ -33,7 +33,7 @@ class Config
   int get_map_x_size() const { return _map_x_size; }
   int get_map_y_size() const { return _map_y_size; }
   std::map<Coordinate, double, cmpCoordinate>& get_coord_cost_map() { return _coord_cost_map; }
-  std::map<Coordinate, std::vector<ObsType>, cmpCoordinate>& get_coord_obs_map() { return _coord_obs_map; }
+  std::map<Coordinate, std::set<ObsType>, cmpCoordinate>& get_coord_obs_map() { return _coord_obs_map; }
   int get_log_verbose() const { return _log_verbose; }
   bool get_turning_back() const { return _turning_back; }
   // setter

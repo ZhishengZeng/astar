@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-06 17:22:34
+ * @LastEditTime: 2021-12-07 11:58:36
  * @FilePath: /astar/include/Model.h
  */
 
@@ -76,7 +76,7 @@ class Model
   void updatePathHead();
   void expandSearching();
   std::vector<Node*> getNeighborsByPathHead();
-  bool invaild(Node* node);
+  bool touchByHead(Node* node);
   bool needReplaceParentNode(Node* node);
   void updateParentByPathHead(Node* node);
   void reportResult();

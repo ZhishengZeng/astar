@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-06 12:36:25
+ * @LastEditTime: 2021-12-07 12:19:10
  * @FilePath: /astar/include/Node.h
  */
 
@@ -23,7 +23,7 @@ class Node
   ~Node() {}
   // getter
   Coordinate& get_coord() { return _coord; }
-  std::vector<ObsType>& get_obs_list() { return _obs_list; }
+  std::set<ObsType>& get_obs_set() { return _obs_set; }
   Node* get_parent_node() { return _parent_node; }
   double get_self_cost() const { return _self_cost; }
   double get_cert_cost() const { return _cert_cost; }
@@ -34,7 +34,7 @@ class Node
     _coord.set_x(x);
     _coord.set_y(y);
   }
-  void set_obs_list(const std::vector<ObsType>& obs_list) { _obs_list = obs_list; }
+  void set_obs_set(const std::set<ObsType>& obs_set) { _obs_set = obs_set; }
   void set_parent_node(Node* parent_node) { _parent_node = parent_node; }
   void set_self_cost(const double self_cost) { _self_cost = self_cost; }
   void set_cert_cost(const double cert_cost) { _cert_cost = cert_cost; }
@@ -49,7 +49,7 @@ class Node
 
  private:
   Coordinate _coord;
-  std::vector<ObsType> _obs_list;
+  std::set<ObsType> _obs_set;
   SearchState _search_state = SearchState::kNone;
   Node* _parent_node = nullptr;
   // self cost
