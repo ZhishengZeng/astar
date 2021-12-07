@@ -2,8 +2,8 @@
  * @Author: Zhisheng Zeng
  * @Date: 2021-09-05 21:50:09
  * @Description:
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-12-01 18:53:28
+ * @LastEditors: Zhisheng Zeng
+ * @LastEditTime: 2021-12-06 12:36:25
  * @FilePath: /astar/include/Node.h
  */
 

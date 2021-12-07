@@ -2,8 +2,8 @@
  * @Author: Zhisheng Zeng
  * @Date: 2021-09-11 11:49:07
  * @Description:
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-12-03 21:17:08
+ * @LastEditors: Zhisheng Zeng
+ * @LastEditTime: 2021-12-07 11:16:22
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -132,10 +132,10 @@ std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coor
     reportResult();
   }
   if (log_verbose > 1) {
-    // showResult();
+    printResult();
   }
 
-  return getPathCoord();
+  return getFinalInflectionPath();
 }
 
 void Model::init(const Coordinate& start_coord, const Coordinate& end_coord)
@@ -206,12 +206,18 @@ void Model::initStartNode()
 {
   _start_node->set_cert_cost(0);
   updateEstCost(_start_node);
-  _open_queue.push(_start_node);
+  updateOpen(_start_node);
 }
 
 void Model::updateEstCost(Node* node)
 {
   node->set_est_cost(caculateEstCost(node, _end_node));
+}
+
+void Model::updateOpen(Node* node)
+{
+  node->setOpen();
+  _open_queue.push(node);
 }
 
 double Model::caculateEstCost(Node* a, Node* b)
@@ -255,7 +261,7 @@ void Model::expandSearching()
   std::vector<Node*> neighbor_node_list = getNeighborsByPathHead();
   for (size_t i = 0; i < neighbor_node_list.size(); i++) {
     Node* neighbor_node = neighbor_node_list[i];
-    if (neighbor_node->isClose() || isInvaild(neighbor_node)) {
+    if (neighbor_node->isClose() || invaild(neighbor_node)) {
       continue;
     } else if (neighbor_node->isOpen()) {
       if (needReplaceParentNode(neighbor_node)) {
@@ -264,7 +270,7 @@ void Model::expandSearching()
     } else {
       updateEstCost(neighbor_node);
       updateParentByPathHead(neighbor_node);
-      _open_queue.push(neighbor_node);
+      updateOpen(neighbor_node);
     }
   }
 }
@@ -292,23 +298,9 @@ std::vector<Node*> Model::getNeighborsByPathHead()
   return neighbor_node_list;
 }
 
-bool Model::isInvaild(Node* node)
+bool Model::invaild(Node* node)
 {
-  if (node->isClose()) {
-    return false;
-  }
-  // _path_head_node->get_parent_node();
-  // Direction direction = getDirection(node, _path_head_node);
-  // if (direction == Direction::kH) {
-  //   if (_path_head_node->isHObs() || node->isHObs()) {
-  //     return false;
-  //   }
-  // } else if (direction == Direction::kV) {
-  //   if (_path_head_node->isVObs() || node->isVObs()) {
-  //     return false;
-  //   }
-  // }
-  return true;
+  return false;
 }
 
 bool Model::needReplaceParentNode(Node* node)
@@ -336,35 +328,173 @@ void Model::reportResult()
   std::cout << std::endl;
 }
 
-std::vector<Coordinate> Model::getPathCoord()
+void Model::printResult()
 {
-  std::vector<Coordinate> path_coord;
+  int factor = 10;
 
-  if (_path_head_node == nullptr || _path_head_node != _end_node) {
-    return path_coord;
+  int none_layer = 0;
+  int open_layer = 1;
+  int close_layer = 2;
+  int obs_layer = 3;
+  int start_layer = 4;
+  int end_layer = 5;
+  int path_layer = 6;
+
+  std::ostringstream oss;
+  oss << "a_star.gds";
+  std::string gds_file_path = oss.str();
+  oss.clear();
+
+  std::ofstream gds_file(gds_file_path);
+  if (gds_file.is_open()) {
+    gds_file << "HEADER 600" << std::endl;
+    gds_file << "BGNLIB" << std::endl;
+    gds_file << "LIBNAME DensityLib" << std::endl;
+    gds_file << "UNITS 0.001 1e-9" << std::endl;
+
+    gds_file << "BGNSTR" << std::endl;
+    gds_file << "STRNAME a_star" << std::endl;
+    // open close none
+    for (int x = 0; x < _grid_map.get_x_size(); x++) {
+      for (int y = 0; y < _grid_map.get_y_size(); y++) {
+        Node& node = _grid_map[x][y];
+
+        gds_file << "BOUNDARY" << std::endl;
+        if (node.isOpen()) {
+          gds_file << "LAYER " << open_layer << std::endl;
+        } else if (node.isClose()) {
+          gds_file << "LAYER " << close_layer << std::endl;
+        } else {
+          gds_file << "LAYER " << none_layer << std::endl;
+        }
+        gds_file << "DATATYPE 0" << std::endl;
+        gds_file << "XY" << std::endl;
+        gds_file << x * factor << " : " << y * factor << std::endl;
+        gds_file << (x + 1) * factor << " : " << y * factor << std::endl;
+        gds_file << (x + 1) * factor << " : " << (y + 1) * factor << std::endl;
+        gds_file << x * factor << " : " << (y + 1) * factor << std::endl;
+        gds_file << x * factor << " : " << y * factor << std::endl;
+        gds_file << "ENDEL" << std::endl;
+        // obs
+        std::vector<ObsType>& obs_list = node.get_obs_list();
+        for (size_t i = 0; i < obs_list.size(); i++) {
+          ObsType& obs_type = obs_list[i];
+          gds_file << "PATH" << std::endl;
+          gds_file << "LAYER " << obs_layer << std::endl;
+          gds_file << "DATATYPE 0" << std::endl;
+          gds_file << "WIDTH " << 1 << std::endl;
+          gds_file << "XY" << std::endl;
+          switch (obs_type) {
+            case ObsType::kHLeftObs:
+              gds_file << x * factor + 1 << " : " << y * factor + 1 << std::endl;
+              gds_file << x * factor + 1 << " : " << (y + 1) * factor - 1 << std::endl;
+              break;
+            case ObsType::kHRightObs:
+              gds_file << (x + 1) * factor - 1 << " : " << y * factor + 1 << std::endl;
+              gds_file << (x + 1) * factor - 1 << " : " << (y + 1) * factor - 1 << std::endl;
+              break;
+            case ObsType::kVTopObs:
+              gds_file << x * factor + 1 << " : " << (y + 1) * factor - 1 << std::endl;
+              gds_file << (x + 1) * factor - 1 << " : " << (y + 1) * factor - 1 << std::endl;
+              break;
+            case ObsType::kVBottomObs:
+              gds_file << x * factor + 1 << " : " << y * factor + 1 << std::endl;
+              gds_file << (x + 1) * factor - 1 << " : " << y * factor + 1 << std::endl;
+              break;
+            default:
+              std::cout << "[AStar Error] Invaild OBS type!" << std::endl;
+              exit(1);
+          }
+          gds_file << "ENDEL" << std::endl;
+        }
+      }
+    }
+    // start end path
+    std::vector<Coordinate> coord_list = getCoordPath();
+
+    for (size_t i = 0; i < coord_list.size(); i++) {
+      Coordinate& coord = coord_list[i];
+      gds_file << "BOUNDARY" << std::endl;
+      if (i == 0) {
+        gds_file << "LAYER " << start_layer << std::endl;
+      } else if (i == coord_list.size() - 1) {
+        gds_file << "LAYER " << end_layer << std::endl;
+      } else {
+        gds_file << "LAYER " << path_layer << std::endl;
+      }
+      gds_file << "DATATYPE 0" << std::endl;
+      gds_file << "XY" << std::endl;
+      gds_file << coord.get_x() * factor << " : " << coord.get_y() * factor << std::endl;
+      gds_file << (coord.get_x() + 1) * factor << " : " << coord.get_y() * factor << std::endl;
+      gds_file << (coord.get_x() + 1) * factor << " : " << (coord.get_y() + 1) * factor << std::endl;
+      gds_file << coord.get_x() * factor << " : " << (coord.get_y() + 1) * factor << std::endl;
+      gds_file << coord.get_x() * factor << " : " << coord.get_y() * factor << std::endl;
+      gds_file << "ENDEL" << std::endl;
+    }
+
+    gds_file << "ENDSTR" << std::endl;
+    gds_file << "ENDLIB" << std::endl;
+    gds_file.close();
+    std::cout << "[AStar Info] Routing result has been written to '" << gds_file_path << "'!" << std::endl;
+  } else {
+    std::cout << "[AStar Error] Failed to open gds file '" << gds_file_path << "'!" << std::endl;
+    exit(1);
+  }
+}
+
+std::vector<Coordinate> Model::getCoordPath()
+{
+  std::vector<Coordinate> coord_path;
+
+  coord_path.push_back(_end_node->get_coord());
+
+  Node* temp_node = nullptr;
+  if (_path_head_node == _end_node) {
+    temp_node = _path_head_node->get_parent_node();
+  } else {
+    temp_node = _path_head_node;
   }
 
-  path_coord.push_back(_end_node->get_coord());
+  while (temp_node != _start_node) {
+    coord_path.push_back(temp_node->get_coord());
+    temp_node = temp_node->get_parent_node();
+  }
+  coord_path.push_back(_start_node->get_coord());
+
+  for (size_t i = 0, j = (coord_path.size() - 1); i < j; i++, j--) {
+    std::swap(coord_path[i], coord_path[j]);
+  }
+
+  return coord_path;
+}
+
+std::vector<Coordinate> Model::getFinalInflectionPath()
+{
+  std::vector<Coordinate> inflection_path;
+
+  if (_path_head_node == nullptr || _path_head_node != _end_node) {
+    return inflection_path;
+  }
+
+  inflection_path.push_back(_end_node->get_coord());
   Direction curr_direction = getDirection(_path_head_node, _path_head_node->get_parent_node());
 
   Node* temp_node = _path_head_node;
-  do {
+  while (temp_node != _start_node) {
     Direction direction = getDirection(temp_node, temp_node->get_parent_node());
     if (curr_direction != direction) {
       curr_direction = direction;
-      path_coord.push_back(temp_node->get_coord());
+      inflection_path.push_back(temp_node->get_coord());
     }
     temp_node = temp_node->get_parent_node();
+  }
+  inflection_path.push_back(_start_node->get_coord());
 
-  } while (temp_node != _start_node);
-
-  path_coord.push_back(_start_node->get_coord());
-
-  for (size_t i = 0, j = (path_coord.size() - 1); i < j; i++, j--) {
-    std::swap(path_coord[i], path_coord[j]);
+  for (size_t i = 0, j = (inflection_path.size() - 1); i < j; i++, j--) {
+    std::swap(inflection_path[i], inflection_path[j]);
   }
 
-  return path_coord;
+  return inflection_path;
 }
 
 Direction Model::getDirection(Node* start_node, Node* end_node)
@@ -377,6 +507,7 @@ Direction Model::getDirection(Node* start_node, Node* end_node)
     return Direction::kV;
   } else {
     std::cout << "[astar Error] Invaild Direction!" << std::endl;
+    exit(1);
   }
 }
 

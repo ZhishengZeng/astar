@@ -2,8 +2,8 @@
  * @Author: Zhisheng Zeng
  * @Date: 2021-09-11 11:49:07
  * @Description:
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-12-03 21:18:27
+ * @LastEditors: Zhisheng Zeng
+ * @LastEditTime: 2021-12-06 17:22:34
  * @FilePath: /astar/include/Model.h
  */
 
@@ -13,11 +13,13 @@
 #include <assert.h>
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <list>
 #include <map>
 #include <queue>
 #include <set>
+#include <sstream>
 #include <vector>
 
 #include "Config.h"
@@ -68,16 +70,19 @@ class Model
   void addObsToGridMap();
   void initStartNode();
   void updateEstCost(Node* node);
+  void updateOpen(Node* node);
   double caculateEstCost(Node* a, Node* b);
   void initOffsetList();
   void updatePathHead();
   void expandSearching();
   std::vector<Node*> getNeighborsByPathHead();
-  bool isInvaild(Node* node);
+  bool invaild(Node* node);
   bool needReplaceParentNode(Node* node);
   void updateParentByPathHead(Node* node);
   void reportResult();
-  std::vector<Coordinate> getPathCoord();
+  void printResult();
+  std::vector<Coordinate> getCoordPath();
+  std::vector<Coordinate> getFinalInflectionPath();
   Direction getDirection(Node* start_node, Node* end_node);
   bool isHorizontal(Coordinate& start_coord, Coordinate& end_coord);
   bool isVertical(Coordinate& start_coord, Coordinate& end_coord);
