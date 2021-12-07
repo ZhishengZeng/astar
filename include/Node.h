@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 22:27:41
+ * @LastEditTime: 2021-12-07 22:59:17
  * @FilePath: /astar/include/Node.h
  */
 
@@ -64,13 +64,11 @@ struct cmpNodeCost
 {
   bool operator()(Node* a, Node* b)
   {
-    return a->getTotalCost() >= b->getTotalCost();
-
-    // if (a->getTotalCost() == b->getTotalCost()) {
-    //   return (a->get_self_cost() + a->get_est_sum()) > (b->get_self_cost() + b->get_est_sum());
-    // } else {
-    //   return a->getTotalCost() > b->getTotalCost();
-    // }
+    if (std::abs(a->getTotalCost() - b->getTotalCost()) <= 10E-6) {
+      return (a->get_self_cost() + a->get_est_sum()) > (b->get_self_cost() + b->get_est_sum());
+    } else {
+      return a->getTotalCost() > b->getTotalCost();
+    }
   }
 };
 
