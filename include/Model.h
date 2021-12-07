@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 11:58:36
+ * @LastEditTime: 2021-12-07 22:33:35
  * @FilePath: /astar/include/Model.h
  */
 
@@ -26,7 +26,10 @@
 #include "Direction.h"
 #include "GridMap.h"
 #include "Node.h"
-#define SHOWRESULT 1
+
+#define LENGTH_UNIT 1
+#define COST_UNIT 1
+#define CORNER_UNIT 1
 
 namespace astar {
 class Model
@@ -58,7 +61,6 @@ class Model
   Node* _end_node = nullptr;
   Node* _path_head_node = nullptr;
   // object
-  double _min_node_cost = 0;
   std::vector<Coordinate> _offset_list;
 
   void init(const Coordinate& start_coord, const Coordinate& end_coord);
@@ -66,7 +68,6 @@ class Model
   void addStartNodeToGridMap(const Coordinate& coord);
   void addEndNodeToGridMap(const Coordinate& coord);
   void addCostToGridMap();
-  void legalizeCost();
   void addObsToGridMap();
   void initStartNode();
   void updateEstCost(Node* node);
@@ -78,6 +79,7 @@ class Model
   std::vector<Node*> getNeighborsByPathHead();
   bool touchByHead(Node* node);
   bool needReplaceParentNode(Node* node);
+  double getCertSumByHead(Node* node);
   void updateParentByPathHead(Node* node);
   void reportResult();
   void printResult();

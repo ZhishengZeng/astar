@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 14:00:54
+ * @LastEditTime: 2021-12-07 21:51:46
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -116,6 +116,7 @@ std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coor
     // 更新路径头节点
     updatePathHead();
     // 路径头节点抵达终点
+    printResult();
     if (_path_head_node == _end_node) {
       break;
     }
@@ -155,6 +156,7 @@ void Model::initGridMap()
   for (int i = 0; i < (int) _grid_map.get_x_size(); i++) {
     for (int j = 0; j < (int) _grid_map.get_y_size(); j++) {
       _grid_map[i][j].set_coord(i, j);
+      _grid_map[i][j].set_self_cost(COST_UNIT);
     }
   }
 }
@@ -171,16 +173,6 @@ void Model::addEndNodeToGridMap(const Coordinate& coord)
 
 void Model::addCostToGridMap()
 {
-  legalizeCost();
-  std::map<Coordinate, double, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
-
-  for (auto [coord, cost] : coord_cost_map) {
-    _grid_map[coord.get_x()][coord.get_y()].set_self_cost(cost);
-  }
-}
-
-void Model::legalizeCost()
-{
   std::map<Coordinate, double, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
 
   double min_cost = __DBL_MAX__;
@@ -190,7 +182,11 @@ void Model::legalizeCost()
 
   std::map<Coordinate, double>::iterator iter;
   for (iter = coord_cost_map.begin(); iter != coord_cost_map.end(); iter++) {
-    iter->second -= min_cost;
+    iter->second = (iter->second - min_cost + COST_UNIT);
+  }
+
+  for (auto [coord, cost] : coord_cost_map) {
+    _grid_map[coord.get_x()][coord.get_y()].set_self_cost(cost);
   }
 }
 
@@ -204,14 +200,14 @@ void Model::addObsToGridMap()
 
 void Model::initStartNode()
 {
-  _start_node->set_cert_cost(0);
+  _start_node->set_cert_sum(0);
   updateEstCost(_start_node);
   updateOpen(_start_node);
 }
 
 void Model::updateEstCost(Node* node)
 {
-  node->set_est_cost(caculateEstCost(node, _end_node));
+  node->set_est_sum(caculateEstCost(node, _end_node));
 }
 
 void Model::updateOpen(Node* node)
@@ -222,9 +218,12 @@ void Model::updateOpen(Node* node)
 
 double Model::caculateEstCost(Node* a, Node* b)
 {
-  int total_length = std::abs(a->get_coord().get_x() - b->get_coord().get_x())
-                     + std::abs(a->get_coord().get_y() - b->get_coord().get_y());
-  return total_length + total_length * _min_node_cost;
+  double est_length = std::abs(a->get_coord().get_x() - b->get_coord().get_x())
+                      + std::abs(a->get_coord().get_y() - b->get_coord().get_y());
+  double est_cost = est_length * COST_UNIT;
+  double est_corner = CORNER_UNIT;
+
+  return (est_length + est_cost + est_corner);
 }
 
 void Model::initOffsetList()
@@ -341,16 +340,28 @@ bool Model::touchByHead(Node* node)
 
 bool Model::needReplaceParentNode(Node* node)
 {
+  return getCertSumByHead(node) < node->get_cert_sum();
+}
+
+double Model::getCertSumByHead(Node* node)
+{
   double cost = 0;
-  cost += _path_head_node->get_cert_cost();
+  cost += _path_head_node->get_cert_sum();
   cost += _path_head_node->get_self_cost();
-  cost += 1;
-  return cost < node->get_cert_cost();
+  cost += LENGTH_UNIT;
+
+  if (_path_head_node->get_parent_node()) {
+    if (getDirection(_path_head_node->get_parent_node(), _path_head_node) != getDirection(_path_head_node, node)) {
+      cost += CORNER_UNIT;
+    }
+  }
+
+  return cost;
 }
 
 void Model::updateParentByPathHead(Node* node)
 {
-  node->set_cert_cost(_path_head_node->get_cert_cost() + _path_head_node->get_self_cost() + 1);
+  node->set_cert_sum(getCertSumByHead(node));
   node->set_parent_node(_path_head_node);
 }
 

@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 12:19:10
+ * @LastEditTime: 2021-12-07 22:27:41
  * @FilePath: /astar/include/Node.h
  */
 
@@ -26,8 +26,8 @@ class Node
   std::set<ObsType>& get_obs_set() { return _obs_set; }
   Node* get_parent_node() { return _parent_node; }
   double get_self_cost() const { return _self_cost; }
-  double get_cert_cost() const { return _cert_cost; }
-  double get_est_cost() const { return _est_cost; }
+  double get_cert_sum() const { return _cert_sum; }
+  double get_est_sum() const { return _est_sum; }
   // setter
   void set_coord(const int x, const int y)
   {
@@ -37,15 +37,15 @@ class Node
   void set_obs_set(const std::set<ObsType>& obs_set) { _obs_set = obs_set; }
   void set_parent_node(Node* parent_node) { _parent_node = parent_node; }
   void set_self_cost(const double self_cost) { _self_cost = self_cost; }
-  void set_cert_cost(const double cert_cost) { _cert_cost = cert_cost; }
-  void set_est_cost(const double est_cost) { _est_cost = est_cost; }
+  void set_cert_sum(const double cert_sum) { _cert_sum = cert_sum; }
+  void set_est_sum(const double est_sum) { _est_sum = est_sum; }
 
   // function
   void setOpen() { _search_state = SearchState::kOpen; }
   void setClose() { _search_state = SearchState::kClose; }
   bool isOpen() const { return _search_state == SearchState::kOpen; }
   bool isClose() const { return _search_state == SearchState::kClose; }
-  double getTotalCost() const { return (_self_cost + _cert_cost + _est_cost); }
+  double getTotalCost() const { return (_cert_sum + _self_cost + _est_sum); }
 
  private:
   Coordinate _coord;
@@ -53,16 +53,25 @@ class Node
   SearchState _search_state = SearchState::kNone;
   Node* _parent_node = nullptr;
   // self cost
-  double _self_cost = 0;
+  double _self_cost = 0.0;
   // the certain cost of this_node from start_node
-  double _cert_cost = 0;
+  double _cert_sum = 0.0;
   // the estimate cost of this_node to end_node
-  double _est_cost = 0;
+  double _est_sum = 0.0;
 };
 
 struct cmpNodeCost
 {
-  bool operator()(Node* a, Node* b) { return a->getTotalCost() >= b->getTotalCost(); }
+  bool operator()(Node* a, Node* b)
+  {
+    return a->getTotalCost() >= b->getTotalCost();
+
+    // if (a->getTotalCost() == b->getTotalCost()) {
+    //   return (a->get_self_cost() + a->get_est_sum()) > (b->get_self_cost() + b->get_est_sum());
+    // } else {
+    //   return a->getTotalCost() > b->getTotalCost();
+    // }
+  }
 };
 
 }  // namespace astar
