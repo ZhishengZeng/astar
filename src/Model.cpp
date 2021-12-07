@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 21:51:46
+ * @LastEditTime: 2021-12-07 22:36:37
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -116,7 +116,6 @@ std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coor
     // 更新路径头节点
     updatePathHead();
     // 路径头节点抵达终点
-    printResult();
     if (_path_head_node == _end_node) {
       break;
     }
