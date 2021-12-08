@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 22:59:17
+ * @LastEditTime: 2021-12-08 11:15:10
  * @FilePath: /astar/include/Node.h
  */
 
@@ -13,6 +13,10 @@
 #include "Coordinate.h"
 #include "ObsType.h"
 #include "SearchState.h"
+
+#define LENGTH_UNIT 1
+#define COST_UNIT 0.001
+#define CORNER_UNIT 1
 
 namespace astar {
 
@@ -64,7 +68,7 @@ struct cmpNodeCost
 {
   bool operator()(Node* a, Node* b)
   {
-    if (std::abs(a->getTotalCost() - b->getTotalCost()) <= 10E-6) {
+    if (std::abs(a->getTotalCost() - b->getTotalCost()) <= COST_UNIT) {
       return (a->get_self_cost() + a->get_est_sum()) > (b->get_self_cost() + b->get_est_sum());
     } else {
       return a->getTotalCost() > b->getTotalCost();

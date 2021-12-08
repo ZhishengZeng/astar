@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 23:07:33
+ * @LastEditTime: 2021-12-08 11:13:57
  * @FilePath: /astar/include/Model.h
  */
 
@@ -26,10 +26,6 @@
 #include "Direction.h"
 #include "GridMap.h"
 #include "Node.h"
-
-#define LENGTH_UNIT 1
-#define COST_UNIT 0.001
-#define CORNER_UNIT 1
 
 namespace astar {
 class Model
