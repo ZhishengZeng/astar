@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-08 11:13:57
+ * @LastEditTime: 2021-12-09 13:56:26
  * @FilePath: /astar/include/Model.h
  */
 
@@ -69,11 +69,16 @@ class Model
   void updateEstCost(Node* node);
   void updateOpen(Node* node);
   double caculateEstCost(Node* a, Node* b);
+  double getEstCorner(Node* start_node, Node* end_node);
+  std::vector<std::vector<Node*>> tryRouting(Node* start_node, Node* end_node);
+  std::vector<std::vector<Node*>> routingStraight(Node* start_node, Node* end_node);
+  bool passCheckingSegment(Node* start_node, Node* end_node);
+  std::vector<std::vector<Node*>> routingLShape(Node* start_node, Node* end_node);
+  int getMinCornerNum(std::vector<std::vector<Node*>>& coord_path_list);
   void initOffsetList();
   void updatePathHead();
   void expandSearching();
   std::vector<Node*> getNeighborsByPathHead();
-  bool touchByHead(Node* node);
   bool needReplaceParentNode(Node* node);
   double getCertSumByHead(Node* node);
   void updateParentByPathHead(Node* node);
@@ -82,6 +87,7 @@ class Model
   std::vector<Coordinate> getCoordPath();
   std::vector<Coordinate> getFinalInflectionPath();
   Direction getDirection(Node* start_node, Node* end_node);
+  bool isStraight(Node* start_node, Node* end_node);
   bool isHorizontal(Coordinate& start_coord, Coordinate& end_coord);
   bool isVertical(Coordinate& start_coord, Coordinate& end_coord);
 };

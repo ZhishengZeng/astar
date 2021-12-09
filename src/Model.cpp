@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 22:36:37
+ * @LastEditTime: 2021-12-09 13:55:16
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -215,14 +215,200 @@ void Model::updateOpen(Node* node)
   _open_queue.push(node);
 }
 
-double Model::caculateEstCost(Node* a, Node* b)
+double Model::caculateEstCost(Node* start_node, Node* end_node)
 {
-  double est_length = std::abs(a->get_coord().get_x() - b->get_coord().get_x())
-                      + std::abs(a->get_coord().get_y() - b->get_coord().get_y());
+  double est_length = std::abs(start_node->get_coord().get_x() - end_node->get_coord().get_x())
+                      + std::abs(start_node->get_coord().get_y() - end_node->get_coord().get_y());
   double est_cost = est_length * COST_UNIT;
-  double est_corner = CORNER_UNIT;
+
+  double est_corner = getEstCorner(start_node, end_node);
 
   return (est_length + est_cost + est_corner);
+}
+
+double Model::getEstCorner(Node* start_node, Node* end_node)
+{
+  std::vector<std::vector<Node*>> coord_path_list = tryRouting(start_node, end_node);
+
+  int est_corner_num = 0;
+  if (coord_path_list.size() > 0) {
+    est_corner_num = getMinCornerNum(coord_path_list);
+  } else {
+    est_corner_num = 2;
+  }
+  return (est_corner_num * CORNER_UNIT);
+}
+
+std::vector<std::vector<Node*>> Model::tryRouting(Node* start_node, Node* end_node)
+{
+  std::vector<std::vector<Node*>> coord_path_list;
+
+  if (isStraight(start_node, end_node)) {
+    coord_path_list = routingStraight(start_node, end_node);
+  } else {
+    coord_path_list = routingLShape(start_node, end_node);
+  }
+  return coord_path_list;
+}
+
+std::vector<std::vector<Node*>> Model::routingStraight(Node* start_node, Node* end_node)
+{
+  std::vector<std::vector<Node*>> coord_path_list;
+
+  if (passCheckingSegment(start_node, end_node)) {
+    std::vector<Node*> coord_path;
+
+    if (start_node->get_parent_node()) {
+      coord_path.push_back(start_node->get_parent_node());
+    }
+    coord_path.push_back(start_node);
+    coord_path.push_back(end_node);
+    coord_path_list.push_back(coord_path);
+  }
+  return coord_path_list;
+}
+
+bool Model::passCheckingSegment(Node* start_node, Node* end_node)
+{
+  Direction direction = getDirection(start_node, end_node);
+
+  Coordinate& start_coord = start_node->get_coord();
+  Coordinate& end_coord = end_node->get_coord();
+
+  if (direction == Direction::kH) {
+    int start_x = start_coord.get_x();
+    int end_x = end_coord.get_x();
+    int y = start_coord.get_y();
+
+    int offset = 0;
+    if (start_x < end_x) {
+      offset = 1;
+    } else if (start_x > end_x) {
+      offset = -1;
+    } else {
+      std::cout << "[AStar Error] The abs of offset is not 1!" << std::endl;
+      exit(1);
+    }
+
+    for (int x = start_x; x < end_x; x += offset) {
+      Node* pre_node = &_grid_map[x][y];
+      Node* curr_node = &_grid_map[x + offset][y];
+
+      if (offset == 1) {
+        // left to right
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kHRightObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kHLeftObs)) {
+          return false;
+        }
+      } else if (offset == -1) {
+        // right to left
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kHLeftObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kHRightObs)) {
+          return false;
+        }
+      }
+    }
+  } else if (direction == Direction::kV) {
+    int start_y = start_coord.get_y();
+    int end_y = end_coord.get_y();
+    int x = start_coord.get_x();
+
+    int offset = 0;
+    if (start_y < end_y) {
+      offset = 1;
+    } else if (start_y > end_y) {
+      offset = -1;
+    } else {
+      std::cout << "[AStar Error] The abs of offset is not 1!" << std::endl;
+      exit(1);
+    }
+
+    for (int y = start_y; y < end_y; y += offset) {
+      Node* pre_node = &_grid_map[x][y];
+      Node* curr_node = &_grid_map[x][y + offset];
+
+      if (offset == 1) {
+        // down to up
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kHRightObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kHLeftObs)) {
+          return false;
+        }
+      } else if (offset == -1) {
+        // up to down
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kHLeftObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kHRightObs)) {
+          return false;
+        }
+      }
+    }
+  } else {
+    std::cout << "[AStar Error] Segment is not straight!" << std::endl;
+    exit(1);
+  }
+  return true;
+}
+
+std::vector<std::vector<Node*>> Model::routingLShape(Node* start_node, Node* end_node)
+{
+  Coordinate& start_coord = start_node->get_coord();
+  Coordinate& end_coord = end_node->get_coord();
+
+  std::vector<std::vector<Node*>> coord_path_list;
+
+  Node* Inflection_node1 = &_grid_map[start_coord.get_x()][end_coord.get_y()];
+  if (passCheckingSegment(start_node, Inflection_node1) && passCheckingSegment(Inflection_node1, end_node)) {
+    std::vector<Node*> coord_path;
+
+    if (start_node->get_parent_node()) {
+      coord_path.push_back(start_node->get_parent_node());
+    }
+    coord_path.push_back(start_node);
+    coord_path.push_back(Inflection_node1);
+    coord_path.push_back(end_node);
+    coord_path_list.push_back(coord_path);
+  }
+
+  Node* Inflection_node2 = &_grid_map[end_coord.get_x()][start_coord.get_y()];
+  if (passCheckingSegment(start_node, Inflection_node2) && passCheckingSegment(Inflection_node2, end_node)) {
+    std::vector<Node*> coord_path;
+
+    if (start_node->get_parent_node()) {
+      coord_path.push_back(start_node->get_parent_node());
+    }
+    coord_path.push_back(start_node);
+    coord_path.push_back(Inflection_node2);
+    coord_path.push_back(end_node);
+    coord_path_list.push_back(coord_path);
+  }
+
+  return coord_path_list;
+}
+
+int Model::getMinCornerNum(std::vector<std::vector<Node*>>& coord_path_list)
+{
+  int min_corner_num = __INT_MAX__;
+
+  if (coord_path_list.size() == 0) {
+    min_corner_num = 0;
+  }
+
+  for (size_t i = 0; i < coord_path_list.size(); i++) {
+    int corner_num = 0;
+    std::vector<Node*>& coord_path = coord_path_list[i];
+    for (size_t j = 2; j < coord_path.size(); j++) {
+      if (getDirection(coord_path[j - 2], coord_path[j - 1]) != getDirection(coord_path[j - 1], coord_path[j])) {
+        corner_num++;
+      }
+    }
+    min_corner_num = std::min(min_corner_num, corner_num);
+  }
+
+  if (min_corner_num == __INT_MAX__) {
+    std::cout << "[AStar Error] Corner num cannot update!" << std::endl;
+    exit(1);
+  }
+
+  return min_corner_num;
 }
 
 void Model::initOffsetList()
@@ -259,7 +445,7 @@ void Model::expandSearching()
   std::vector<Node*> neighbor_node_list = getNeighborsByPathHead();
   for (size_t i = 0; i < neighbor_node_list.size(); i++) {
     Node* neighbor_node = neighbor_node_list[i];
-    if (neighbor_node->isClose() || (!touchByHead(neighbor_node))) {
+    if (neighbor_node->isClose() || (!passCheckingSegment(_path_head_node, neighbor_node))) {
       continue;
     }
     if (neighbor_node->isOpen()) {
@@ -295,46 +481,6 @@ std::vector<Node*> Model::getNeighborsByPathHead()
     neighbor_node_list.emplace_back(&_grid_map[x][y]);
   }
   return neighbor_node_list;
-}
-
-bool Model::touchByHead(Node* node)
-{
-  Coordinate& head_coord = _path_head_node->get_coord();
-  Coordinate& to_coord = node->get_coord();
-
-  int head_x = head_coord.get_x();
-  int head_y = head_coord.get_y();
-  int to_x = to_coord.get_x();
-  int to_y = to_coord.get_y();
-
-  if (head_x < to_x) {
-    // left to right
-    if (Util::exist(_path_head_node->get_obs_set(), ObsType::kHRightObs)
-        || Util::exist(node->get_obs_set(), ObsType::kHLeftObs)) {
-      return false;
-    }
-  } else if (head_x > to_x) {
-    if (Util::exist(_path_head_node->get_obs_set(), ObsType::kHLeftObs)
-        || Util::exist(node->get_obs_set(), ObsType::kHRightObs)) {
-      return false;
-    }
-  }
-
-  if (head_y < to_y) {
-    // down to up
-    if (Util::exist(_path_head_node->get_obs_set(), ObsType::kVTopObs)
-        || Util::exist(node->get_obs_set(), ObsType::kVBottomObs)) {
-      return false;
-    }
-  } else if (head_y > to_y) {
-    // up to down
-    if (Util::exist(_path_head_node->get_obs_set(), ObsType::kVBottomObs)
-        || Util::exist(node->get_obs_set(), ObsType::kVTopObs)) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 bool Model::needReplaceParentNode(Node* node)
@@ -549,9 +695,15 @@ Direction Model::getDirection(Node* start_node, Node* end_node)
   } else if (isVertical(start_coord, end_coord)) {
     return Direction::kV;
   } else {
-    std::cout << "[astar Error] Invaild Direction!" << std::endl;
-    exit(1);
+    return Direction::kOblique;
   }
+}
+
+bool Model::isStraight(Node* start_node, Node* end_node)
+{
+  Coordinate& start_coord = start_node->get_coord();
+  Coordinate& end_coord = end_node->get_coord();
+  return isHorizontal(start_coord, end_coord) || isVertical(start_coord, end_coord);
 }
 
 bool Model::isHorizontal(Coordinate& start_coord, Coordinate& end_coord)
