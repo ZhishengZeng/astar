@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 16:22:16
+ * @LastEditTime: 2021-12-09 14:13:22
  * @FilePath: /astar/tests/random_case_run.cpp
  */
 
@@ -16,6 +16,7 @@
 
 #include "Model.h"
 #include "Util.h"
+
 int main()
 {
   int n = 1;
@@ -56,3 +57,16 @@ int main()
   }
   return 0;
 }
+
+// int main()
+// {
+//   astar::Model astar_model;
+//   astar_model.buildMap(10, 1);
+//   astar_model.setLogVerbose(2);
+//   astar_model.addObstacle({3, 0}, astar::ObsType::kHLeftObs);
+//   astar_model.addObstacle({3, 0}, astar::ObsType::kHRightObs);
+//   astar_model.addObstacle({5, 0}, astar::ObsType::kHLeftObs);
+//   astar_model.addObstacle({5, 0}, astar::ObsType::kHRightObs);
+//   astar_model.getPath({9, 0}, {0, 0}).size();
+//   return 0;
+// }

@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-09 13:55:16
+ * @LastEditTime: 2021-12-09 14:11:52
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -228,6 +228,10 @@ double Model::caculateEstCost(Node* start_node, Node* end_node)
 
 double Model::getEstCorner(Node* start_node, Node* end_node)
 {
+  if (equalCoord(start_node, end_node)) {
+    return 0;
+  }
+
   std::vector<std::vector<Node*>> coord_path_list = tryRouting(start_node, end_node);
 
   int est_corner_num = 0;
@@ -237,6 +241,11 @@ double Model::getEstCorner(Node* start_node, Node* end_node)
     est_corner_num = 2;
   }
   return (est_corner_num * CORNER_UNIT);
+}
+
+bool Model::equalCoord(Node* start_node, Node* end_node)
+{
+  return start_node->get_coord() == end_node->get_coord();
 }
 
 std::vector<std::vector<Node*>> Model::tryRouting(Node* start_node, Node* end_node)
@@ -290,7 +299,7 @@ bool Model::passCheckingSegment(Node* start_node, Node* end_node)
       exit(1);
     }
 
-    for (int x = start_x; x < end_x; x += offset) {
+    for (int x = start_x; x != end_x; x += offset) {
       Node* pre_node = &_grid_map[x][y];
       Node* curr_node = &_grid_map[x + offset][y];
 
@@ -323,20 +332,20 @@ bool Model::passCheckingSegment(Node* start_node, Node* end_node)
       exit(1);
     }
 
-    for (int y = start_y; y < end_y; y += offset) {
+    for (int y = start_y; y != end_y; y += offset) {
       Node* pre_node = &_grid_map[x][y];
       Node* curr_node = &_grid_map[x][y + offset];
 
       if (offset == 1) {
         // down to up
-        if (Util::exist(pre_node->get_obs_set(), ObsType::kHRightObs)
-            || Util::exist(curr_node->get_obs_set(), ObsType::kHLeftObs)) {
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kVTopObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kVBottomObs)) {
           return false;
         }
       } else if (offset == -1) {
         // up to down
-        if (Util::exist(pre_node->get_obs_set(), ObsType::kHLeftObs)
-            || Util::exist(curr_node->get_obs_set(), ObsType::kHRightObs)) {
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kVBottomObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kVTopObs)) {
           return false;
         }
       }

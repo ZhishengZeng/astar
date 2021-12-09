@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-09 13:56:26
+ * @LastEditTime: 2021-12-09 14:03:37
  * @FilePath: /astar/include/Model.h
  */
 
@@ -70,6 +70,7 @@ class Model
   void updateOpen(Node* node);
   double caculateEstCost(Node* a, Node* b);
   double getEstCorner(Node* start_node, Node* end_node);
+  bool equalCoord(Node* start_node, Node* end_node);
   std::vector<std::vector<Node*>> tryRouting(Node* start_node, Node* end_node);
   std::vector<std::vector<Node*>> routingStraight(Node* start_node, Node* end_node);
   bool passCheckingSegment(Node* start_node, Node* end_node);
