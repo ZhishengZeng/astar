@@ -14,10 +14,10 @@ namespace astar {
 enum class ObsType
 {
   kNone = 0,
-  kHLeftObs = 1,
-  kHRightObs = 2,
-  kVBottomObs = 3,
-  kVTopObs = 4
+  kEastObs = 1,
+  kWestObs = 2,
+  kSouthObs = 3,
+  kNorthObs = 4
 };
 
 }  // namespace astar

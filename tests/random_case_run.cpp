@@ -63,10 +63,10 @@ int main()
 //   astar::Model astar_model;
 //   astar_model.buildMap(10, 1);
 //   astar_model.setLogVerbose(2);
-//   astar_model.addObstacle({3, 0}, astar::ObsType::kHLeftObs);
-//   astar_model.addObstacle({3, 0}, astar::ObsType::kHRightObs);
-//   astar_model.addObstacle({5, 0}, astar::ObsType::kHLeftObs);
-//   astar_model.addObstacle({5, 0}, astar::ObsType::kHRightObs);
+//   astar_model.addObstacle({3, 0}, astar::ObsType::kWestObs);
+//   astar_model.addObstacle({3, 0}, astar::ObsType::kEastObs);
+//   astar_model.addObstacle({5, 0}, astar::ObsType::kWestObs);
+//   astar_model.addObstacle({5, 0}, astar::ObsType::kEastObs);
 //   astar_model.getPath({9, 0}, {0, 0}).size();
 //   return 0;
 // }

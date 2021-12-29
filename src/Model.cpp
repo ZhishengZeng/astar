@@ -305,14 +305,14 @@ bool Model::passCheckingSegment(Node* start_node, Node* end_node)
 
       if (offset == 1) {
         // left to right
-        if (Util::exist(pre_node->get_obs_set(), ObsType::kHRightObs)
-            || Util::exist(curr_node->get_obs_set(), ObsType::kHLeftObs)) {
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kEastObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kWestObs)) {
           return false;
         }
       } else if (offset == -1) {
         // right to left
-        if (Util::exist(pre_node->get_obs_set(), ObsType::kHLeftObs)
-            || Util::exist(curr_node->get_obs_set(), ObsType::kHRightObs)) {
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kWestObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kEastObs)) {
           return false;
         }
       }
@@ -338,14 +338,14 @@ bool Model::passCheckingSegment(Node* start_node, Node* end_node)
 
       if (offset == 1) {
         // down to up
-        if (Util::exist(pre_node->get_obs_set(), ObsType::kVTopObs)
-            || Util::exist(curr_node->get_obs_set(), ObsType::kVBottomObs)) {
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kNorthObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kSouthObs)) {
           return false;
         }
       } else if (offset == -1) {
         // up to down
-        if (Util::exist(pre_node->get_obs_set(), ObsType::kVBottomObs)
-            || Util::exist(curr_node->get_obs_set(), ObsType::kVTopObs)) {
+        if (Util::exist(pre_node->get_obs_set(), ObsType::kSouthObs)
+            || Util::exist(curr_node->get_obs_set(), ObsType::kNorthObs)) {
           return false;
         }
       }
@@ -588,19 +588,19 @@ void Model::printResult()
           gds_file << "WIDTH " << 1 << std::endl;
           gds_file << "XY" << std::endl;
           switch (obs_type) {
-            case ObsType::kHLeftObs:
+            case ObsType::kWestObs:
               gds_file << x * factor + 1 << " : " << y * factor + 1 << std::endl;
               gds_file << x * factor + 1 << " : " << (y + 1) * factor - 1 << std::endl;
               break;
-            case ObsType::kHRightObs:
+            case ObsType::kEastObs:
               gds_file << (x + 1) * factor - 1 << " : " << y * factor + 1 << std::endl;
               gds_file << (x + 1) * factor - 1 << " : " << (y + 1) * factor - 1 << std::endl;
               break;
-            case ObsType::kVTopObs:
+            case ObsType::kNorthObs:
               gds_file << x * factor + 1 << " : " << (y + 1) * factor - 1 << std::endl;
               gds_file << (x + 1) * factor - 1 << " : " << (y + 1) * factor - 1 << std::endl;
               break;
-            case ObsType::kVBottomObs:
+            case ObsType::kSouthObs:
               gds_file << x * factor + 1 << " : " << y * factor + 1 << std::endl;
               gds_file << (x + 1) * factor - 1 << " : " << y * factor + 1 << std::endl;
               break;
