@@ -132,7 +132,7 @@ std::vector<Coordinate> Model::getPath(const Coordinate& start_coord, const Coor
     reportResult();
   }
   if (log_verbose > 1) {
-    printResult();
+    plotResult();
   }
 
   return getFinalInflectionPath();
@@ -529,7 +529,7 @@ void Model::reportResult()
   std::cout << std::endl;
 }
 
-void Model::printResult()
+void Model::plotResult()
 {
   int factor = 10;
 

@@ -84,7 +84,7 @@ class Model
   double getCertSumByHead(Node* node);
   void updateParentByPathHead(Node* node);
   void reportResult();
-  void printResult();
+  void plotResult();
   std::vector<Coordinate> getCoordPath();
   std::vector<Coordinate> getFinalInflectionPath();
   Direction getDirection(Node* start_node, Node* end_node);
