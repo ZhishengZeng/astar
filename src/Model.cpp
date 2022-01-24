@@ -199,14 +199,14 @@ void Model::addObsToGridMap()
 
 void Model::initStartNode()
 {
-  _start_node->set_cert_sum(0);
+  _start_node->set_known_cost(0);
   updateEstCost(_start_node);
   updateOpen(_start_node);
 }
 
 void Model::updateEstCost(Node* node)
 {
-  node->set_est_sum(caculateEstCost(node, _end_node));
+  node->set_estimated_cost(caculateEstCost(node, _end_node));
 }
 
 void Model::updateOpen(Node* node)
@@ -494,13 +494,13 @@ std::vector<Node*> Model::getNeighborsByPathHead()
 
 bool Model::needReplaceParentNode(Node* node)
 {
-  return getCertSumByHead(node) < node->get_cert_sum();
+  return getCertSumByHead(node) < node->get_known_cost();
 }
 
 double Model::getCertSumByHead(Node* node)
 {
   double cost = 0;
-  cost += _path_head_node->get_cert_sum();
+  cost += _path_head_node->get_known_cost();
   cost += _path_head_node->get_self_cost();
   cost += LENGTH_UNIT;
 
@@ -515,7 +515,7 @@ double Model::getCertSumByHead(Node* node)
 
 void Model::updateParentByPathHead(Node* node)
 {
-  node->set_cert_sum(getCertSumByHead(node));
+  node->set_known_cost(getCertSumByHead(node));
   node->set_parent_node(_path_head_node);
 }
 
