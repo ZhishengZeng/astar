@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 16:11:10
+ * @LastEditTime: 2022-01-25 16:27:12
  * @FilePath: /astar/include/Node.h
  */
 
@@ -15,7 +15,7 @@
 #include "SearchState.h"
 
 #define LENGTH_UNIT 1
-#define COST_UNIT 0.001
+#define COST_UNIT 0.01
 #define CORNER_UNIT 1
 
 namespace astar {

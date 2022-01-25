@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 14:52:22
+ * @LastEditTime: 2022-01-25 16:23:28
  * @FilePath: /astar/include/Model.h
  */
 
@@ -42,8 +42,8 @@ class Model
   }
 
   void buildMap(const int x_size, const int y_size);
-  void addOBS(const Coordinate& coord, const std::vector<Direction2d>& orientation_2d_list);
-  void addCost(const Coordinate& coord, const std::vector<Direction2d>& orientation_2d_list, const double cost);
+  void addOBS(const Coordinate& coord, const Direction2d& direction_2d);
+  void addCost(const Coordinate& coord, const Direction2d& direction_2d, const double cost);
   void setLogVerbose(const int level = 0);
   void enableTurningBack();
   void disableTurningBack();

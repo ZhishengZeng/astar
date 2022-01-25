@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 15:52:08
+ * @LastEditTime: 2022-01-25 16:28:45
  * @FilePath: /astar/tests/random_case_run.cpp
  */
 
@@ -46,14 +46,14 @@ int main()
     std::vector<astar::Coordinate> obs_coord_list;
     for (size_t i = 1; i < coord_list.size() - 1; i++) {
       astar::Direction2d type = (astar::Direction2d)(rand() % 4 + 1);
-      astar_model.addOBS(coord_list[i], {type});
+      astar_model.addOBS(coord_list[i], type);
     }
 
     std::vector<std::pair<astar::Coordinate, double>> coord_cost_list;
     for (size_t i = 1; i < coord_list.size() - 1; i++) {
       double cost = rand() % 4 + 1;
       astar::Direction2d type = (astar::Direction2d)(rand() % 4 + 1);
-      astar_model.addCost(coord_list[i], {type}, cost);
+      astar_model.addCost(coord_list[i], type, cost);
     }
 
     std::vector<astar::Coordinate> path = astar_model.getPath(coord_list.front(), coord_list.back());

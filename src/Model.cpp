@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 16:16:58
+ * @LastEditTime: 2022-01-25 16:28:22
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -28,29 +28,26 @@ void Model::buildMap(const int x_size, const int y_size)
  * @description: Add obstacle node
  *
  * @param {Coordinate} coord
- * @param {char} type_flag
+ * @param {Direction2d} direction_2d
  * @return {*}
  */
-void Model::addOBS(const Coordinate& coord, const std::vector<Direction2d>& direction_2d_list)
+void Model::addOBS(const Coordinate& coord, const Direction2d& direction_2d)
 {
   std::map<Coordinate, std::map<Direction2d, bool>, cmpCoordinate>& coord_obs_map = _config.get_coord_obs_map();
-  for (size_t i = 0; i < direction_2d_list.size(); i++) {
-    coord_obs_map[coord][direction_2d_list[i]] = true;
-  }
+  coord_obs_map[coord][direction_2d] = true;
 }
 
 /**
- * @description: Add node cost. Node cost is 0 by default
+ * @description: Add node cost. Default is 0.01
  * @param {Coordinate} coord
+ * @param {Direction2d} direction_2d
  * @param {double} cost
  * @return {*}
  */
-void Model::addCost(const Coordinate& coord, const std::vector<Direction2d>& direction_2d_list, const double cost)
+void Model::addCost(const Coordinate& coord, const Direction2d& direction_2d, const double cost)
 {
   std::map<Coordinate, std::map<Direction2d, double>, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
-  for (size_t i = 0; i < direction_2d_list.size(); i++) {
-    coord_cost_map[coord][direction_2d_list[i]] = cost;
-  }
+  coord_cost_map[coord][direction_2d] = cost;
 }
 
 /**
