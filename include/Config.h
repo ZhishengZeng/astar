@@ -3,7 +3,7 @@
  * @Date: 2021-09-17 11:51:30
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-24 23:55:27
+ * @LastEditTime: 2022-01-25 19:31:31
  * @FilePath: /astar/include/Config.h
  */
 #ifndef ASTAR_INCLUDE_CONFIG_H_
@@ -12,8 +12,8 @@
 #include <vector>
 
 #include "Coordinate.h"
-#include "ObsType.h"
 #include "Direction2d.h"
+#include "ObsType.h"
 
 namespace astar {
 

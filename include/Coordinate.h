@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-09-15 14:10:52
+ * @LastEditTime: 2022-01-25 19:31:34
  * @FilePath: /astar/include/Coordinate.h
  */
 
@@ -19,10 +19,7 @@ class Coordinate
   Coordinate(int x, int y) : _x(x), _y(y) {}
   ~Coordinate() {}
 
-  bool operator==(Coordinate& other)
-  {
-    return (_x == other._x && _y == other._y);
-  }
+  bool operator==(Coordinate& other) { return (_x == other._x && _y == other._y); }
   bool operator!=(Coordinate& other) { return !((*this) == other); }
   // getter
   int get_x() const { return _x; }
@@ -40,8 +37,7 @@ struct cmpCoordinate
 {
   bool operator()(Coordinate a, Coordinate b) const
   {
-    return a.get_x() != b.get_x() ? a.get_x() < b.get_x()
-                                  : a.get_y() < b.get_y();
+    return a.get_x() != b.get_x() ? a.get_x() < b.get_x() : a.get_y() < b.get_y();
   }
 };
 
