@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 16:28:45
+ * @LastEditTime: 2022-01-25 19:01:36
  * @FilePath: /astar/tests/random_case_run.cpp
  */
 
@@ -17,6 +17,16 @@
 #include "Model.h"
 #include "Util.h"
 
+std::vector<astar::Coordinate> getRandomCoordList(int x_size, int y_size, int size)
+{
+  std::set<astar::Coordinate, astar::cmpCoordinate> coord_set;
+  while ((int) coord_set.size() < size) {
+    coord_set.insert({rand() % x_size, rand() % y_size});
+  }
+
+  return std::vector<astar::Coordinate>(coord_set.begin(), coord_set.end());
+}
+
 int main()
 {
   int n = 1;
@@ -26,14 +36,13 @@ int main()
     double start_time, end_time;
     start_time = astar::Util::microtime();
 
-    int x_size = 8;
-    int y_size = 8;
+    int x_size = 20;
+    int y_size = 20;
+
     srand((unsigned) time(NULL));
-    std::set<astar::Coordinate, astar::cmpCoordinate> coord_set;
-    while ((int) coord_set.size() < (x_size * y_size / 2)) {
-      coord_set.insert({rand() % x_size, rand() % y_size});
-    }
-    std::vector<astar::Coordinate> coord_list(coord_set.begin(), coord_set.end());
+    std::vector<astar::Coordinate> random_obs_list = getRandomCoordList(x_size, y_size, x_size * y_size / 4);
+    std::vector<astar::Coordinate> random_cost_list = getRandomCoordList(x_size, y_size, x_size * y_size / 2);
+    std::vector<astar::Coordinate> random_term_list = getRandomCoordList(x_size, y_size, 2);
 
     end_time = astar::Util::microtime();
     std::cout << "[astar Info] Create example time:" << (end_time - start_time) << std::endl;
@@ -44,19 +53,20 @@ int main()
     astar_model.buildMap(x_size, y_size);
 
     std::vector<astar::Coordinate> obs_coord_list;
-    for (size_t i = 1; i < coord_list.size() - 1; i++) {
-      astar::Direction2d type = (astar::Direction2d)(rand() % 4 + 1);
-      astar_model.addOBS(coord_list[i], type);
+    for (size_t i = 1; i < random_obs_list.size() - 1; i++) {
+      astar_model.addOBS(random_obs_list[i], (astar::Direction2d)(rand() % 4 + 1));
+      astar_model.addOBS(random_obs_list[i], (astar::Direction2d)(rand() % 4 + 1));
     }
 
     std::vector<std::pair<astar::Coordinate, double>> coord_cost_list;
-    for (size_t i = 1; i < coord_list.size() - 1; i++) {
-      double cost = rand() % 4 + 1;
-      astar::Direction2d type = (astar::Direction2d)(rand() % 4 + 1);
-      astar_model.addCost(coord_list[i], type, cost);
+    for (size_t i = 0; i < random_cost_list.size(); i++) {
+      astar_model.addCost(random_cost_list[i], (astar::Direction2d)(rand() % 4 + 1), rand() % 4 + 1);
+      astar_model.addCost(random_cost_list[i], (astar::Direction2d)(rand() % 4 + 1), rand() % 4 + 1);
+      astar_model.addCost(random_cost_list[i], (astar::Direction2d)(rand() % 4 + 1), rand() % 4 + 1);
+      astar_model.addCost(random_cost_list[i], (astar::Direction2d)(rand() % 4 + 1), rand() % 4 + 1);
     }
 
-    std::vector<astar::Coordinate> path = astar_model.getPath(coord_list.front(), coord_list.back());
+    std::vector<astar::Coordinate> path = astar_model.getPath(random_obs_list.front(), random_obs_list.back());
 
     end_time = astar::Util::microtime();
     std::cout << "[astar Info] Run time:" << (end_time - start_time) << std::endl;

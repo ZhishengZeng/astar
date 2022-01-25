@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 16:23:28
+ * @LastEditTime: 2022-01-25 18:16:28
  * @FilePath: /astar/include/Model.h
  */
 
@@ -59,6 +59,7 @@ class Model
   Node* _end = nullptr;
   Node* _path_head = nullptr;
   // object
+  int _min_cost = COST_UNIT;
   std::vector<Coordinate> _offset_list;
 
   void init(const Coordinate& start_coord, const Coordinate& end_coord);

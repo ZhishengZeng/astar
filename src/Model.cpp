@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 16:28:22
+ * @LastEditTime: 2022-01-25 19:00:22
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -202,12 +202,16 @@ void Model::legalizeCostMap()
       min_cost = std::min(min_cost, iter->second);
     }
   }
-  for (auto [coord, cost_map] : coord_cost_map) {
-    std::map<Direction2d, double>::iterator iter;
-    for (iter = cost_map.begin(); iter != cost_map.end(); iter++) {
-      iter->second = (iter->second - min_cost + COST_UNIT);
+
+  if (min_cost < COST_UNIT) {
+    for (auto [coord, cost_map] : coord_cost_map) {
+      std::map<Direction2d, double>::iterator iter;
+      for (iter = cost_map.begin(); iter != cost_map.end(); iter++) {
+        iter->second = (iter->second - min_cost + COST_UNIT);
+      }
     }
   }
+  _min_cost = std::max(min_cost, COST_UNIT);
 }
 
 void Model::addCostToGridMap()
@@ -348,7 +352,7 @@ std::vector<Coordinate> Model::getFinalInflectionPath()
 std::string convertToString(double value)
 {
   std::stringstream oss;
-  oss << std::setiosflags(std::ios::fixed) << std::setprecision(2) << value;
+  oss << std::setiosflags(std::ios::fixed) << std::setprecision(3) << value;
   std::string string = oss.str();
   oss.clear();
   return string;
@@ -574,7 +578,7 @@ double Model::getKnowCornerCost(Node* start, Node* end)
 double Model::getEstimateCost(Node* start, Node* end)
 {
   double est_length = getManhattanDistance(start, end);
-  double est_cost = est_length * (2 * COST_UNIT);
+  double est_cost = est_length * (2 * _min_cost);
   double est_corner_cost = getEstimateCornerCost(start, end);
 
   return (est_length + est_cost + est_corner_cost);
