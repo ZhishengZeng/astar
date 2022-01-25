@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 15:42:50
+ * @LastEditTime: 2022-01-25 16:16:58
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -351,7 +351,7 @@ std::vector<Coordinate> Model::getFinalInflectionPath()
 std::string convertToString(double value)
 {
   std::stringstream oss;
-  oss << std::setiosflags(std::ios::fixed) << std::setprecision(3) << value;
+  oss << std::setiosflags(std::ios::fixed) << std::setprecision(2) << value;
   std::string string = oss.str();
   oss.clear();
   return string;
@@ -359,7 +359,7 @@ std::string convertToString(double value)
 
 void Model::plotResult()
 {
-  int factor = 100;
+  int factor = 50;
   int obs_indent = factor * 0.1;
   int text_indent = factor * 0.5;
 
@@ -449,10 +449,12 @@ void Model::plotResult()
         // cost
         std::map<Direction2d, double>& cost_map = node.get_cost_map();
         for (auto& [direction_2d, cost] : cost_map) {
+          if (cost == COST_UNIT) {
+            continue;
+          }
           gds_file << "TEXT" << std::endl;
           gds_file << "LAYER " << obs_and_cost_layer << std::endl;
           gds_file << "TEXTTYPE 0" << std::endl;
-
           switch (direction_2d) {
             case Direction2d::kWest:
               // 0000000000000100
@@ -764,7 +766,7 @@ Direction2d Model::getDirection2d(Node* start, Node* end)
   if (isHorizontal(start, end)) {
     return (start_coord.get_x() - end_coord.get_x()) > 0 ? Direction2d::kWest : Direction2d::kEast;
   } else if (isVertical(start, end)) {
-    return (start_coord.get_y() - end_coord.get_y()) > 0 ? Direction2d::kSouth : Direction2d::kSouth;
+    return (start_coord.get_y() - end_coord.get_y()) > 0 ? Direction2d::kSouth : Direction2d::kNorth;
   } else {
     std::cout << "[AStar Error] Segment is not straight!" << std::endl;
     exit(1);

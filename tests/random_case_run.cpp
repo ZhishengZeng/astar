@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 13:59:27
+ * @LastEditTime: 2022-01-25 15:52:08
  * @FilePath: /astar/tests/random_case_run.cpp
  */
 
@@ -26,9 +26,9 @@ int main()
     double start_time, end_time;
     start_time = astar::Util::microtime();
 
-    int x_size = 5;
-    int y_size = 5;
-    // srand((unsigned) time(NULL));
+    int x_size = 8;
+    int y_size = 8;
+    srand((unsigned) time(NULL));
     std::set<astar::Coordinate, astar::cmpCoordinate> coord_set;
     while ((int) coord_set.size() < (x_size * y_size / 2)) {
       coord_set.insert({rand() % x_size, rand() % y_size});
