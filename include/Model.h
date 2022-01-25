@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-09 14:03:37
+ * @LastEditTime: 2022-01-25 14:52:22
  * @FilePath: /astar/include/Model.h
  */
 
@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <list>
 #include <map>
@@ -23,9 +24,10 @@
 #include <vector>
 
 #include "Config.h"
-#include "Direction.h"
+#include "Direction2d.h"
 #include "GridMap.h"
 #include "Node.h"
+#include "Orientation2d.h"
 
 namespace astar {
 class Model
@@ -34,15 +36,15 @@ class Model
   Model() {}
   ~Model()
   {
-    _start_node = nullptr;
-    _end_node = nullptr;
-    _path_head_node = nullptr;
+    _start = nullptr;
+    _end = nullptr;
+    _path_head = nullptr;
   }
 
-  void buildMap(int x_size, int y_size);
-  void addNodeCost(const Coordinate& coord, const double cost);
-  void addObstacle(const Coordinate& coord, ObsType type);
-  void setLogVerbose(int level);
+  void buildMap(const int x_size, const int y_size);
+  void addOBS(const Coordinate& coord, const std::vector<Direction2d>& orientation_2d_list);
+  void addCost(const Coordinate& coord, const std::vector<Direction2d>& orientation_2d_list, const double cost);
+  void setLogVerbose(const int level = 0);
   void enableTurningBack();
   void disableTurningBack();
   std::vector<Coordinate> getPath(const Coordinate& start_coord, const Coordinate& end_coord);
@@ -53,9 +55,9 @@ class Model
   GridMap<Node> _grid_map;
   std::priority_queue<Node*, std::vector<Node*>, cmpNodeCost> _open_queue;
 
-  Node* _start_node = nullptr;
-  Node* _end_node = nullptr;
-  Node* _path_head_node = nullptr;
+  Node* _start = nullptr;
+  Node* _end = nullptr;
+  Node* _path_head = nullptr;
   // object
   std::vector<Coordinate> _offset_list;
 
@@ -63,34 +65,38 @@ class Model
   void initGridMap();
   void addStartNodeToGridMap(const Coordinate& coord);
   void addEndNodeToGridMap(const Coordinate& coord);
-  void addCostToGridMap();
   void addObsToGridMap();
+  void legalizeCostMap();
+  void addCostToGridMap();
   void initStartNode();
-  void updateEstCost(Node* node);
-  void updateOpen(Node* node);
-  double caculateEstCost(Node* a, Node* b);
-  double getEstCorner(Node* start_node, Node* end_node);
-  bool equalCoord(Node* start_node, Node* end_node);
-  std::vector<std::vector<Node*>> tryRouting(Node* start_node, Node* end_node);
-  std::vector<std::vector<Node*>> routingStraight(Node* start_node, Node* end_node);
-  bool passCheckingSegment(Node* start_node, Node* end_node);
-  std::vector<std::vector<Node*>> routingLShape(Node* start_node, Node* end_node);
-  int getMinCornerNum(std::vector<std::vector<Node*>>& coord_path_list);
   void initOffsetList();
-  void updatePathHead();
   void expandSearching();
   std::vector<Node*> getNeighborsByPathHead();
-  bool needReplaceParentNode(Node* node);
-  double getCertSumByHead(Node* node);
-  void updateParentByPathHead(Node* node);
+  bool replaceParentNode(Node* start, Node* end);
   void reportResult();
+  std::vector<Coordinate> getFinalInflectionPath();
+  // Plot;
   void plotResult();
   std::vector<Coordinate> getCoordPath();
-  std::vector<Coordinate> getFinalInflectionPath();
-  Direction getDirection(Node* start_node, Node* end_node);
-  bool isStraight(Node* start_node, Node* end_node);
-  bool isHorizontal(Coordinate& start_coord, Coordinate& end_coord);
-  bool isVertical(Coordinate& start_coord, Coordinate& end_coord);
+  // Calculate known cost;
+  double getKnowCost(Node* start, Node* end);
+  double getKnowCornerCost(Node* start, Node* end);
+  // Calculate estimate cost
+  double getEstimateCost(Node* start, Node* end);
+  double getEstimateCornerCost(Node* start, Node* end);
+  std::vector<std::vector<Node*>> tryRouting(Node* start, Node* end);
+  std::vector<std::vector<Node*>> routingStraight(Node* start, Node* end);
+  bool passCheckingSegment(Node* start, Node* end);
+  std::vector<std::vector<Node*>> routingLShape(Node* start, Node* end);
+  int getMinCornerNum(std::vector<std::vector<Node*>>& coord_path_list);
+  // base
+  Direction2d getDirection2d(Node* start, Node* end);
+  Orientation2d getOrientation2d(Node* start, Node* end);
+  bool isStraight(Node* start, Node* end);
+  bool isHorizontal(Node* start, Node* end);
+  bool isVertical(Node* start, Node* end);
+  bool isPoint(Node* start, Node* end);
+  int getManhattanDistance(Node* start, Node* end);
 };
 
 }  // namespace astar

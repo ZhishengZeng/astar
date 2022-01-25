@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 12:20:12
+ * @LastEditTime: 2022-01-24 23:55:37
  * @FilePath: /astar/include/Util.h
  */
 
@@ -14,6 +14,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <map>
 #include <set>
 
 namespace astar {
@@ -27,6 +28,12 @@ class Util
   static bool exist(const std::set<Key, Compare>& set, const Key& key)
   {
     return (set.find(key) != set.end());
+  }
+
+  template <typename Key, typename Value, typename Compare = std::less<Key>>
+  static bool exist(const std::map<Key, Value, Compare>& map, const Key& key)
+  {
+    return (map.find(key) != map.end());
   }
 };
 

@@ -3,7 +3,7 @@
  * @Date: 2021-09-17 11:51:30
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-07 13:00:33
+ * @LastEditTime: 2022-01-24 23:55:27
  * @FilePath: /astar/include/Config.h
  */
 #ifndef ASTAR_INCLUDE_CONFIG_H_
@@ -13,27 +13,20 @@
 
 #include "Coordinate.h"
 #include "ObsType.h"
+#include "Direction2d.h"
+
 namespace astar {
 
 class Config
 {
- private:
-  int _map_x_size;
-  int _map_y_size;
-  std::map<Coordinate, double, cmpCoordinate> _coord_cost_map;
-  std::map<Coordinate, std::set<ObsType>, cmpCoordinate> _coord_obs_map;
-  int _log_verbose = 0;
-  bool _turning_back = true;
-
  public:
   Config() {}
   ~Config() {}
-
   // getter
   int get_map_x_size() const { return _map_x_size; }
   int get_map_y_size() const { return _map_y_size; }
-  std::map<Coordinate, double, cmpCoordinate>& get_coord_cost_map() { return _coord_cost_map; }
-  std::map<Coordinate, std::set<ObsType>, cmpCoordinate>& get_coord_obs_map() { return _coord_obs_map; }
+  std::map<Coordinate, std::map<Direction2d, double>, cmpCoordinate>& get_coord_cost_map() { return _coord_cost_map; }
+  std::map<Coordinate, std::map<Direction2d, bool>, cmpCoordinate>& get_coord_obs_map() { return _coord_obs_map; }
   int get_log_verbose() const { return _log_verbose; }
   bool get_turning_back() const { return _turning_back; }
   // setter
@@ -43,6 +36,14 @@ class Config
   void set_turning_back(const bool turning_back) { _turning_back = turning_back; }
   // function
   bool isTurningBack() { return _turning_back; }
+
+ private:
+  int _map_x_size = -1;
+  int _map_y_size = -1;
+  std::map<Coordinate, std::map<Direction2d, double>, cmpCoordinate> _coord_cost_map;
+  std::map<Coordinate, std::map<Direction2d, bool>, cmpCoordinate> _coord_obs_map;
+  int _log_verbose = 0;
+  bool _turning_back = true;
 };
 
 }  // namespace astar
