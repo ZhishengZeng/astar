@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 19:00:22
+ * @LastEditTime: 2022-02-09 16:15:23
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -322,22 +322,29 @@ std::vector<Coordinate> Model::getFinalInflectionPath()
 {
   std::vector<Coordinate> inflection_path;
 
-  if (_path_head == nullptr || _path_head != _end) {
+  if (_path_head == nullptr) {
+    return inflection_path;
+  }
+
+  if (_path_head != _end) {
     return inflection_path;
   }
 
   inflection_path.push_back(_end->get_coord());
-  Orientation2d curr_orientation_2d = getOrientation2d(_path_head, _path_head->get_parent_node());
 
-  Node* temp_node = _path_head;
-  while (temp_node != _start) {
-    Orientation2d orientation_2d = getOrientation2d(temp_node, temp_node->get_parent_node());
-    if (curr_orientation_2d != orientation_2d) {
-      curr_orientation_2d = orientation_2d;
-      inflection_path.push_back(temp_node->get_coord());
+  if (_path_head->get_parent_node() != nullptr) {
+    Orientation2d curr_orientation_2d = getOrientation2d(_path_head, _path_head->get_parent_node());
+    Node* temp_node = _path_head;
+    while (temp_node != _start) {
+      Orientation2d orientation_2d = getOrientation2d(temp_node, temp_node->get_parent_node());
+      if (curr_orientation_2d != orientation_2d) {
+        curr_orientation_2d = orientation_2d;
+        inflection_path.push_back(temp_node->get_coord());
+      }
+      temp_node = temp_node->get_parent_node();
     }
-    temp_node = temp_node->get_parent_node();
   }
+
   inflection_path.push_back(_start->get_coord());
 
   for (size_t i = 0, j = (inflection_path.size() - 1); i < j; i++, j--) {

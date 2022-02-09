@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 18:18:18
+ * @LastEditTime: 2022-02-09 16:23:23
  * @FilePath: /astar/include/Node.h
  */
 
@@ -16,7 +16,7 @@
 
 #define LENGTH_UNIT 1
 #define COST_UNIT 0.001
-#define CORNER_UNIT 1
+#define CORNER_UNIT 2
 
 namespace astar {
 

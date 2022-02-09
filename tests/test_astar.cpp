@@ -3,7 +3,7 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 16:23:57
+ * @LastEditTime: 2022-02-09 16:16:24
  * @FilePath: /astar/tests/test_astar.cpp
  */
 
@@ -70,6 +70,14 @@ TEST(RoutingTest, Reached6)
   astar_model.addOBS({0, 0}, astar::Direction2d::kSouth);
   astar_model.addOBS({0, 0}, astar::Direction2d::kNorth);
   EXPECT_TRUE(astar_model.getPath({9, 0}, {0, 0}).size());
+}
+
+TEST(RoutingTest, Reached7)
+{
+  astar::Model astar_model;
+  astar_model.buildMap(1, 1);
+  astar_model.setLogVerbose(2);
+  astar_model.getPath({0, 0}, {0, 0});
 }
 
 TEST(RoutingTest, NoWhere1)
