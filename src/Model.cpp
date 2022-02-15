@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-02-09 16:15:23
+ * @LastEditTime: 2022-02-15 15:46:03
  * @FilePath: /astar/src/Model.cpp
  */
 #include "Model.h"
@@ -349,6 +349,13 @@ std::vector<Coordinate> Model::getFinalInflectionPath()
 
   for (size_t i = 0, j = (inflection_path.size() - 1); i < j; i++, j--) {
     std::swap(inflection_path[i], inflection_path[j]);
+  }
+
+  if (inflection_path.size() >= 2 || inflection_path.empty()) {
+    return inflection_path;
+  } else {
+    std::cout << "[astar Info] Inflection path error!!" << std::endl;
+    assert(false);
   }
 
   return inflection_path;
