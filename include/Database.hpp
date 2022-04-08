@@ -11,8 +11,8 @@
 
 #include <vector>
 
-#include "Coordinate.h"
-#include "ObsType.h"
+#include "Coordinate.hpp"
+#include "ObsType.hpp"
 namespace astar {
 
 class Database

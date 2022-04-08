@@ -17,7 +17,7 @@
 #ifndef ASTAR_INCLUDE_SEARCHSTATE_H_
 #define ASTAR_INCLUDE_SEARCHSTATE_H_
 
-#include "Coordinate.h"
+#include "Coordinate.hpp"
 
 namespace astar {
 

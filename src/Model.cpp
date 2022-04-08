@@ -6,9 +6,9 @@
  * @LastEditTime: 2022-02-15 15:46:03
  * @FilePath: /astar/src/Model.cpp
  */
-#include "Model.h"
+#include "Model.hpp"
 
-#include "Util.h"
+#include "Util.hpp"
 
 namespace astar {
 

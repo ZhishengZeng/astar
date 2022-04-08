@@ -3,8 +3,8 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-01-25 18:16:28
- * @FilePath: /astar/include/Model.h
+ * @LastEditTime: 2022-04-08 11:40:39
+ * @FilePath: /astar/include/Model.hpp
  */
 
 #ifndef ASTAR_INCLUDE_MODEL_H_
@@ -23,11 +23,11 @@
 #include <sstream>
 #include <vector>
 
-#include "Config.h"
-#include "Direction2d.h"
-#include "GridMap.h"
-#include "Node.h"
-#include "Orientation2d.h"
+#include "Config.hpp"
+#include "Direction2d.hpp"
+#include "GridMap.hpp"
+#include "Node.hpp"
+#include "Orientation2d.hpp"
 
 namespace astar {
 class Model
@@ -59,7 +59,7 @@ class Model
   Node* _end = nullptr;
   Node* _path_head = nullptr;
   // object
-  int _min_cost = COST_UNIT;
+  double _min_cost = COST_UNIT;
   std::vector<Coordinate> _offset_list;
 
   void init(const Coordinate& start_coord, const Coordinate& end_coord);

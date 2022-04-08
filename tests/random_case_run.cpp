@@ -14,8 +14,8 @@
 #include <set>
 #include <vector>
 
-#include "Model.h"
-#include "Util.h"
+#include "Model.hpp"
+#include "Util.hpp"
 
 std::vector<astar::Coordinate> getRandomCoordList(int x_size, int y_size, int size)
 {

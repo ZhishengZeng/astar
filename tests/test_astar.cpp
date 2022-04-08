@@ -7,7 +7,7 @@
  * @FilePath: /astar/tests/test_astar.cpp
  */
 
-#include "Model.h"
+#include "Model.hpp"
 #include "gtest/gtest.h"
 
 namespace {
