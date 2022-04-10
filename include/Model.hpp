@@ -3,7 +3,7 @@
  * @Date: 2021-09-11 11:49:07
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2022-04-08 11:40:39
+ * @LastEditTime: 2022-04-10 18:29:08
  * @FilePath: /astar/include/Model.hpp
  */
 
@@ -24,10 +24,10 @@
 #include <vector>
 
 #include "Config.hpp"
-#include "Direction2d.hpp"
+#include "Orientation.hpp"
 #include "GridMap.hpp"
 #include "Node.hpp"
-#include "Orientation2d.hpp"
+#include "Direction.hpp"
 
 namespace astar {
 class Model
@@ -42,8 +42,8 @@ class Model
   }
 
   void buildMap(const int x_size, const int y_size);
-  void addOBS(const Coordinate& coord, const Direction2d& direction_2d);
-  void addCost(const Coordinate& coord, const Direction2d& direction_2d, const double cost);
+  void addOBS(const Coordinate& coord, const Orientation& orientation);
+  void addCost(const Coordinate& coord, const Orientation& orientation, const double cost);
   void setLogVerbose(const int level = 0);
   void enableTurningBack();
   void disableTurningBack();
@@ -91,8 +91,8 @@ class Model
   std::vector<std::vector<Node*>> routingLShape(Node* start, Node* end);
   int getMinCornerNum(std::vector<std::vector<Node*>>& coord_path_list);
   // base
-  Direction2d getDirection2d(Node* start, Node* end);
-  Orientation2d getOrientation2d(Node* start, Node* end);
+  Orientation getOrientation(Node* start, Node* end);
+  Direction getDirection(Node* start, Node* end);
   bool isStraight(Node* start, Node* end);
   bool isHorizontal(Node* start, Node* end);
   bool isVertical(Node* start, Node* end);

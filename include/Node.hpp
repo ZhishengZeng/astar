@@ -27,8 +27,8 @@ class Node
   ~Node() {}
   // getter
   Coordinate& get_coord() { return _coord; }
-  std::map<Direction2d, bool>& get_obs_map() { return _obs_map; }
-  std::map<Direction2d, double>& get_cost_map() { return _cost_map; }
+  std::map<Orientation, bool>& get_obs_map() { return _obs_map; }
+  std::map<Orientation, double>& get_cost_map() { return _cost_map; }
   Node* get_parent_node() { return _parent_node; }
   double get_known_cost() const { return _known_cost; }
   double get_estimated_cost() const { return _estimated_cost; }
@@ -38,24 +38,24 @@ class Node
     _coord.set_x(x);
     _coord.set_y(y);
   }
-  void set_obs_map(const std::map<Direction2d, bool>& obs_map) { _obs_map = obs_map; }
-  void set_cost_map(const std::map<Direction2d, double>& cost_map) { _cost_map = cost_map; }
+  void set_obs_map(const std::map<Orientation, bool>& obs_map) { _obs_map = obs_map; }
+  void set_cost_map(const std::map<Orientation, double>& cost_map) { _cost_map = cost_map; }
   void set_search_state(SearchState search_state) { _search_state = search_state; }
   void set_parent_node(Node* parent_node) { _parent_node = parent_node; }
   void set_known_cost(const double known_cost) { _known_cost = known_cost; }
   void set_estimated_cost(const double estimated_cost) { _estimated_cost = estimated_cost; }
 
   // function
-  bool isOBS(Direction2d direction_2d) { return _obs_map[direction_2d]; }
-  double getCost(Direction2d direction_2d) { return _cost_map[direction_2d]; }
+  bool isOBS(Orientation orientation) { return _obs_map[orientation]; }
+  double getCost(Orientation orientation) { return _cost_map[orientation]; }
   bool isOpen() { return _search_state == SearchState::kOpen; }
   bool isClose() { return _search_state == SearchState::kClose; }
   double getTotalCost() { return (_known_cost + _estimated_cost); }
 
  private:
   Coordinate _coord;
-  std::map<Direction2d, bool> _obs_map;
-  std::map<Direction2d, double> _cost_map;
+  std::map<Orientation, bool> _obs_map;
+  std::map<Orientation, double> _cost_map;
   SearchState _search_state = SearchState::kNone;
   Node* _parent_node = nullptr;
   // the known cost of this_node start start (include self)

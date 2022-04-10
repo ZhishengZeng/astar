@@ -54,16 +54,16 @@ int main()
 
     std::vector<astar::Coordinate> obs_coord_list;
     for (size_t i = 0; i < random_obs_list.size(); i++) {
-      astar_model.addOBS(random_obs_list[i], (astar::Direction2d)(rand() % 4 + 1));
-      astar_model.addOBS(random_obs_list[i], (astar::Direction2d)(rand() % 4 + 1));
+      astar_model.addOBS(random_obs_list[i], (astar::Orientation)(rand() % 4 + 1));
+      astar_model.addOBS(random_obs_list[i], (astar::Orientation)(rand() % 4 + 1));
     }
 
     std::vector<std::pair<astar::Coordinate, double>> coord_cost_list;
     for (size_t i = 0; i < random_cost_list.size(); i++) {
-      astar_model.addCost(random_cost_list[i], (astar::Direction2d)(rand() % 4 + 1), rand() % 4 + 1);
-      astar_model.addCost(random_cost_list[i], (astar::Direction2d)(rand() % 4 + 1), rand() % 4 + 1);
-      astar_model.addCost(random_cost_list[i], (astar::Direction2d)(rand() % 4 + 1), rand() % 4 + 1);
-      astar_model.addCost(random_cost_list[i], (astar::Direction2d)(rand() % 4 + 1), rand() % 4 + 1);
+      astar_model.addCost(random_cost_list[i], (astar::Orientation)(rand() % 4 + 1), rand() % 4 + 1);
+      astar_model.addCost(random_cost_list[i], (astar::Orientation)(rand() % 4 + 1), rand() % 4 + 1);
+      astar_model.addCost(random_cost_list[i], (astar::Orientation)(rand() % 4 + 1), rand() % 4 + 1);
+      astar_model.addCost(random_cost_list[i], (astar::Orientation)(rand() % 4 + 1), rand() % 4 + 1);
     }
 
     std::vector<astar::Coordinate> path = astar_model.getPath(random_obs_list.front(), random_obs_list.back());

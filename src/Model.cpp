@@ -28,26 +28,26 @@ void Model::buildMap(const int x_size, const int y_size)
  * @description: Add obstacle node
  *
  * @param {Coordinate} coord
- * @param {Direction2d} direction_2d
+ * @param {Orientation} orientation
  * @return {*}
  */
-void Model::addOBS(const Coordinate& coord, const Direction2d& direction_2d)
+void Model::addOBS(const Coordinate& coord, const Orientation& orientation)
 {
-  std::map<Coordinate, std::map<Direction2d, bool>, cmpCoordinate>& coord_obs_map = _config.get_coord_obs_map();
-  coord_obs_map[coord][direction_2d] = true;
+  std::map<Coordinate, std::map<Orientation, bool>, cmpCoordinate>& coord_obs_map = _config.get_coord_obs_map();
+  coord_obs_map[coord][orientation] = true;
 }
 
 /**
  * @description: Add node cost. Default is 0.01
  * @param {Coordinate} coord
- * @param {Direction2d} direction_2d
+ * @param {Orientation} orientation
  * @param {double} cost
  * @return {*}
  */
-void Model::addCost(const Coordinate& coord, const Direction2d& direction_2d, const double cost)
+void Model::addCost(const Coordinate& coord, const Orientation& orientation, const double cost)
 {
-  std::map<Coordinate, std::map<Direction2d, double>, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
-  coord_cost_map[coord][direction_2d] = cost;
+  std::map<Coordinate, std::map<Orientation, double>, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
+  coord_cost_map[coord][orientation] = cost;
 }
 
 /**
@@ -147,15 +147,15 @@ void Model::init(const Coordinate& start_coord, const Coordinate& end_coord)
 
 void Model::initGridMap()
 {
-  std::map<Direction2d, bool> obs_map = {{Direction2d::kEast, false},
-                                         {Direction2d::kSouth, false},
-                                         {Direction2d::kWest, false},
-                                         {Direction2d::kNorth, false}};
+  std::map<Orientation, bool> obs_map = {{Orientation::kEast, false},
+                                         {Orientation::kSouth, false},
+                                         {Orientation::kWest, false},
+                                         {Orientation::kNorth, false}};
 
-  std::map<Direction2d, double> cost_map = {{Direction2d::kEast, COST_UNIT},
-                                            {Direction2d::kSouth, COST_UNIT},
-                                            {Direction2d::kWest, COST_UNIT},
-                                            {Direction2d::kNorth, COST_UNIT}};
+  std::map<Orientation, double> cost_map = {{Orientation::kEast, COST_UNIT},
+                                            {Orientation::kSouth, COST_UNIT},
+                                            {Orientation::kWest, COST_UNIT},
+                                            {Orientation::kNorth, COST_UNIT}};
 
   _grid_map.init(_config.get_map_x_size(), _config.get_map_y_size());
   for (int i = 0; i < (int) _grid_map.get_x_size(); i++) {
@@ -179,12 +179,12 @@ void Model::addEndNodeToGridMap(const Coordinate& coord)
 
 void Model::addObsToGridMap()
 {
-  std::map<Coordinate, std::map<Direction2d, bool>, cmpCoordinate>& coord_obs_map = _config.get_coord_obs_map();
+  std::map<Coordinate, std::map<Orientation, bool>, cmpCoordinate>& coord_obs_map = _config.get_coord_obs_map();
 
   for (auto [coord, obs_map] : coord_obs_map) {
-    std::map<Direction2d, bool>& node_obs_map = _grid_map[coord.get_x()][coord.get_y()].get_obs_map();
+    std::map<Orientation, bool>& node_obs_map = _grid_map[coord.get_x()][coord.get_y()].get_obs_map();
 
-    std::map<Direction2d, bool>::iterator iter;
+    std::map<Orientation, bool>::iterator iter;
     for (iter = obs_map.begin(); iter != obs_map.end(); iter++) {
       node_obs_map[iter->first] = iter->second;
     }
@@ -193,11 +193,11 @@ void Model::addObsToGridMap()
 
 void Model::legalizeCostMap()
 {
-  std::map<Coordinate, std::map<Direction2d, double>, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
+  std::map<Coordinate, std::map<Orientation, double>, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
 
   double min_cost = __DBL_MAX__;
   for (auto [coord, cost_map] : coord_cost_map) {
-    std::map<Direction2d, double>::iterator iter;
+    std::map<Orientation, double>::iterator iter;
     for (iter = cost_map.begin(); iter != cost_map.end(); iter++) {
       min_cost = std::min(min_cost, iter->second);
     }
@@ -205,7 +205,7 @@ void Model::legalizeCostMap()
 
   if (min_cost < COST_UNIT) {
     for (auto [coord, cost_map] : coord_cost_map) {
-      std::map<Direction2d, double>::iterator iter;
+      std::map<Orientation, double>::iterator iter;
       for (iter = cost_map.begin(); iter != cost_map.end(); iter++) {
         iter->second = (iter->second - min_cost + COST_UNIT);
       }
@@ -216,11 +216,11 @@ void Model::legalizeCostMap()
 
 void Model::addCostToGridMap()
 {
-  std::map<Coordinate, std::map<Direction2d, double>, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
+  std::map<Coordinate, std::map<Orientation, double>, cmpCoordinate>& coord_cost_map = _config.get_coord_cost_map();
   for (auto& [coord, cost_map] : coord_cost_map) {
-    std::map<Direction2d, double>& node_cost_map = _grid_map[coord.get_x()][coord.get_y()].get_cost_map();
+    std::map<Orientation, double>& node_cost_map = _grid_map[coord.get_x()][coord.get_y()].get_cost_map();
 
-    std::map<Direction2d, double>::iterator iter;
+    std::map<Orientation, double>::iterator iter;
     for (iter = cost_map.begin(); iter != cost_map.end(); iter++) {
       node_cost_map[iter->first] = iter->second;
     }
@@ -333,12 +333,12 @@ std::vector<Coordinate> Model::getFinalInflectionPath()
   inflection_path.push_back(_end->get_coord());
 
   if (_path_head->get_parent_node() != nullptr) {
-    Orientation2d curr_orientation_2d = getOrientation2d(_path_head, _path_head->get_parent_node());
+    Direction curr_direction = getDirection(_path_head, _path_head->get_parent_node());
     Node* temp_node = _path_head;
     while (temp_node != _start) {
-      Orientation2d orientation_2d = getOrientation2d(temp_node, temp_node->get_parent_node());
-      if (curr_orientation_2d != orientation_2d) {
-        curr_orientation_2d = orientation_2d;
+      Direction direction = getDirection(temp_node, temp_node->get_parent_node());
+      if (curr_direction != direction) {
+        curr_direction = direction;
         inflection_path.push_back(temp_node->get_coord());
       }
       temp_node = temp_node->get_parent_node();
@@ -428,8 +428,8 @@ void Model::plotResult()
         gds_file << real_lb_x << " : " << real_lb_y << std::endl;
         gds_file << "ENDEL" << std::endl;
         // obs
-        std::map<Direction2d, bool>& obs_map = node.get_obs_map();
-        for (auto& [direction_2d, is_obs] : obs_map) {
+        std::map<Orientation, bool>& obs_map = node.get_obs_map();
+        for (auto& [orientation, is_obs] : obs_map) {
           if (!is_obs) {
             continue;
           }
@@ -438,20 +438,20 @@ void Model::plotResult()
           gds_file << "DATATYPE 0" << std::endl;
           gds_file << "WIDTH " << 1 << std::endl;
           gds_file << "XY" << std::endl;
-          switch (direction_2d) {
-            case Direction2d::kWest:
+          switch (orientation) {
+            case Orientation::kWest:
               gds_file << real_lb_x + obs_indent << " : " << real_lb_y + obs_indent << std::endl;
               gds_file << real_lb_x + obs_indent << " : " << real_rt_y - obs_indent << std::endl;
               break;
-            case Direction2d::kEast:
+            case Orientation::kEast:
               gds_file << real_rt_x - obs_indent << " : " << real_lb_y + obs_indent << std::endl;
               gds_file << real_rt_x - obs_indent << " : " << real_rt_y - obs_indent << std::endl;
               break;
-            case Direction2d::kNorth:
+            case Orientation::kNorth:
               gds_file << real_lb_x + obs_indent << " : " << real_rt_y - obs_indent << std::endl;
               gds_file << real_rt_x - obs_indent << " : " << real_rt_y - obs_indent << std::endl;
               break;
-            case Direction2d::kSouth:
+            case Orientation::kSouth:
               gds_file << real_lb_x + obs_indent << " : " << real_lb_y + obs_indent << std::endl;
               gds_file << real_rt_x - obs_indent << " : " << real_lb_y + obs_indent << std::endl;
               break;
@@ -462,34 +462,34 @@ void Model::plotResult()
           gds_file << "ENDEL" << std::endl;
         }
         // cost
-        std::map<Direction2d, double>& cost_map = node.get_cost_map();
-        for (auto& [direction_2d, cost] : cost_map) {
+        std::map<Orientation, double>& cost_map = node.get_cost_map();
+        for (auto& [orientation, cost] : cost_map) {
           if (cost == COST_UNIT) {
             continue;
           }
           gds_file << "TEXT" << std::endl;
           gds_file << "LAYER " << obs_and_cost_layer << std::endl;
           gds_file << "TEXTTYPE 0" << std::endl;
-          switch (direction_2d) {
-            case Direction2d::kWest:
+          switch (orientation) {
+            case Orientation::kWest:
               // 0000000000000100
               gds_file << "PRESENTATION 4" << std::endl;
               gds_file << "XY" << std::endl;
               gds_file << real_lb_x + obs_indent << " : " << real_lb_y + text_indent << std::endl;
               break;
-            case Direction2d::kEast:
+            case Orientation::kEast:
               // 0000000000000110
               gds_file << "PRESENTATION 6" << std::endl;
               gds_file << "XY" << std::endl;
               gds_file << real_rt_x - obs_indent << " : " << real_lb_y + text_indent << std::endl;
               break;
-            case Direction2d::kNorth:
+            case Orientation::kNorth:
               // 0000000000000001
               gds_file << "PRESENTATION 1" << std::endl;
               gds_file << "XY" << std::endl;
               gds_file << real_lb_x + text_indent << " : " << real_rt_y - obs_indent << std::endl;
               break;
-            case Direction2d::kSouth:
+            case Orientation::kSouth:
               // 0000000000001001
               gds_file << "PRESENTATION 9" << std::endl;
               gds_file << "XY" << std::endl;
@@ -570,8 +570,8 @@ double Model::getKnowCost(Node* start, Node* end)
 {
   double cost = 0;
   cost += start->get_known_cost();
-  cost += start->getCost(getDirection2d(start, end));
-  cost += end->getCost(getDirection2d(end, start));
+  cost += start->getCost(getOrientation(start, end));
+  cost += end->getCost(getOrientation(end, start));
   cost += getManhattanDistance(start, end);
   cost += getKnowCornerCost(start, end);
   return cost;
@@ -580,7 +580,7 @@ double Model::getKnowCost(Node* start, Node* end)
 double Model::getKnowCornerCost(Node* start, Node* end)
 {
   if (start->get_parent_node()) {
-    if (getOrientation2d(start->get_parent_node(), start) != getOrientation2d(start, end)) {
+    if (getDirection(start->get_parent_node(), start) != getDirection(start, end)) {
       return CORNER_UNIT;
     }
   }
@@ -646,12 +646,12 @@ std::vector<std::vector<Node*>> Model::routingStraight(Node* start, Node* end)
 
 bool Model::passCheckingSegment(Node* start, Node* end)
 {
-  Orientation2d orientation_2d = getOrientation2d(start, end);
+  Direction direction = getDirection(start, end);
 
   Coordinate& start_coord = start->get_coord();
   Coordinate& end_coord = end->get_coord();
 
-  if (orientation_2d == Orientation2d::kHorizontal) {
+  if (direction == Direction::kHorizontal) {
     int start_x = start_coord.get_x();
     int end_x = end_coord.get_x();
     int y = start_coord.get_y();
@@ -669,12 +669,12 @@ bool Model::passCheckingSegment(Node* start, Node* end)
     for (int x = start_x; x != end_x; x += offset) {
       Node* pre_node = &_grid_map[x][y];
       Node* curr_node = &_grid_map[x + offset][y];
-      if (pre_node->isOBS(getDirection2d(pre_node, curr_node))
-          || curr_node->isOBS(getDirection2d(curr_node, pre_node))) {
+      if (pre_node->isOBS(getOrientation(pre_node, curr_node))
+          || curr_node->isOBS(getOrientation(curr_node, pre_node))) {
         return false;
       }
     }
-  } else if (orientation_2d == Orientation2d::kVertical) {
+  } else if (direction == Direction::kVertical) {
     int start_y = start_coord.get_y();
     int end_y = end_coord.get_y();
     int x = start_coord.get_x();
@@ -693,8 +693,8 @@ bool Model::passCheckingSegment(Node* start, Node* end)
       Node* pre_node = &_grid_map[x][y];
       Node* curr_node = &_grid_map[x][y + offset];
 
-      if (pre_node->isOBS(getDirection2d(pre_node, curr_node))
-          || curr_node->isOBS(getDirection2d(curr_node, pre_node))) {
+      if (pre_node->isOBS(getOrientation(pre_node, curr_node))
+          || curr_node->isOBS(getOrientation(curr_node, pre_node))) {
         return false;
       }
     }
@@ -753,8 +753,8 @@ int Model::getMinCornerNum(std::vector<std::vector<Node*>>& coord_path_list)
     int corner_num = 0;
     std::vector<Node*>& coord_path = coord_path_list[i];
     for (size_t j = 2; j < coord_path.size(); j++) {
-      if (getOrientation2d(coord_path[j - 2], coord_path[j - 1])
-          != getOrientation2d(coord_path[j - 1], coord_path[j])) {
+      if (getDirection(coord_path[j - 2], coord_path[j - 1])
+          != getDirection(coord_path[j - 1], coord_path[j])) {
         corner_num++;
       }
     }
@@ -771,31 +771,31 @@ int Model::getMinCornerNum(std::vector<std::vector<Node*>>& coord_path_list)
 
 // base
 
-Direction2d Model::getDirection2d(Node* start, Node* end)
+Orientation Model::getOrientation(Node* start, Node* end)
 {
   if (isPoint(start, end)) {
-    return Direction2d::kNone;
+    return Orientation::kNone;
   }
   Coordinate& start_coord = start->get_coord();
   Coordinate& end_coord = end->get_coord();
   if (isHorizontal(start, end)) {
-    return (start_coord.get_x() - end_coord.get_x()) > 0 ? Direction2d::kWest : Direction2d::kEast;
+    return (start_coord.get_x() - end_coord.get_x()) > 0 ? Orientation::kWest : Orientation::kEast;
   } else if (isVertical(start, end)) {
-    return (start_coord.get_y() - end_coord.get_y()) > 0 ? Direction2d::kSouth : Direction2d::kNorth;
+    return (start_coord.get_y() - end_coord.get_y()) > 0 ? Orientation::kSouth : Orientation::kNorth;
   } else {
     std::cout << "[AStar Error] Segment is not straight!" << std::endl;
     exit(1);
   }
 }
 
-Orientation2d Model::getOrientation2d(Node* start, Node* end)
+Direction Model::getDirection(Node* start, Node* end)
 {
   if (isHorizontal(start, end)) {
-    return Orientation2d::kHorizontal;
+    return Direction::kHorizontal;
   } else if (isVertical(start, end)) {
-    return Orientation2d::kVertical;
+    return Direction::kVertical;
   } else {
-    return Orientation2d::kOblique;
+    return Direction::kOblique;
   }
 }
 
