@@ -23,11 +23,11 @@
 #include <sstream>
 #include <vector>
 
-#include "Config.hpp"
-#include "Orientation.hpp"
-#include "GridMap.hpp"
-#include "Node.hpp"
-#include "Direction.hpp"
+#include "AS_Config.hpp"
+#include "AS_Orientation.hpp"
+#include "AS_GridMap.hpp"
+#include "AS_Node.hpp"
+#include "AS_Direction.hpp"
 
 namespace astar {
 class Model

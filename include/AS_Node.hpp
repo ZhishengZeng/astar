@@ -10,9 +10,9 @@
 #ifndef ASTAR_INCLUDE_NODE_H_
 #define ASTAR_INCLUDE_NODE_H_
 
-#include "Coordinate.hpp"
-#include "ObsType.hpp"
-#include "SearchState.hpp"
+#include "AS_Coordinate.hpp"
+#include "AS_ObsType.hpp"
+#include "AS_SearchState.hpp"
 
 #define LENGTH_UNIT 1
 #define COST_UNIT 0.001

@@ -11,9 +11,9 @@
 
 #include <vector>
 
-#include "Coordinate.hpp"
-#include "Orientation.hpp"
-#include "ObsType.hpp"
+#include "AS_Coordinate.hpp"
+#include "AS_Orientation.hpp"
+#include "AS_ObsType.hpp"
 
 namespace astar {
 
