@@ -3,13 +3,12 @@
  * @Date: 2021-09-05 21:50:09
  * @Description:
  * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-11-10 13:54:54
- * @FilePath: /astar/include/GridMap.h
+ * @LastEditTime: 2022-04-28 21:44:17
+ * @FilePath: /astar/include/AS_GridMap.hpp
  */
 
-#ifndef ASTAR_INCLUDE_MAT_H_
-#define ASTAR_INCLUDE_MAT_H_
-#include <malloc.h>
+#ifndef ASTAR_INCLUDE_GRIDMAP_H_
+#define ASTAR_INCLUDE_GRIDMAP_H_
 
 #include <cassert>
 
@@ -21,43 +20,67 @@ class GridMap
  public:
   explicit GridMap() {}
   explicit GridMap(int x_size, int y_size) { init(x_size, y_size); }
+  explicit GridMap(int x_size, int y_size, T value) { init(x_size, y_size, value); }
   GridMap(const GridMap& other)
   {
     _x_size = other._x_size;
     _y_size = other._y_size;
-    initArray();
-    cloneArray(other._array);
+    initMap();
+    copyMap(other._map);
   }
   GridMap(GridMap&& other)
   {
     _x_size = std::move(other._x_size);
     _y_size = std::move(other._y_size);
-    _array = std::move(other._array);
-    other._array = nullptr;
+    _map = std::move(other._map);
+    other._map = nullptr;
   }
   ~GridMap() { free(); }
   GridMap& operator=(const GridMap& other)
   {
-    freeArray();
+    freeMap();
     _x_size = other._x_size;
     _y_size = other._y_size;
-    initArray();
-    cloneArray(other._array);
+    initMap();
+    copyMap(other._map);
     return (*this);
   }
   GridMap& operator=(GridMap&& other)
   {
-    freeArray();
+    freeMap();
     _x_size = std::move(other._x_size);
     _y_size = std::move(other._y_size);
-    _array = std::move(other._array);
-    other._array = nullptr;
+    _map = std::move(other._map);
+    other._map = nullptr;
     return (*this);
   }
-  T* operator[](const int i)
+
+  template <typename U>
+  class Proxy
   {
-    assert(0 <= i && i < _x_size);
-    return _array[i];
+   public:
+    Proxy(int y_size, U* array) : _y_size(y_size), _array(array) {}
+    U& operator[](const int i)
+    {
+      if (i < 0 || _y_size <= i) {
+        std::cout << "[GridMap<T> Error] The grid map index y is out of bounds!" << std::endl;
+        assert(false);
+      }
+      return _array[i];
+    }
+
+   private:
+    int _y_size = 0;
+    U* _array = nullptr;
+  };
+
+  Proxy<T> operator[](const int i)
+  {
+    if (i < 0 && _x_size <= i) {
+      std::cout << "[GridMap<T> Error] The grid map index x is out of bounds!" << std::endl;
+      assert(false);
+    }
+    return Proxy<T>(_y_size, _map[i]);
   }
   // getter
   int get_x_size() const { return _x_size; }
@@ -66,6 +89,7 @@ class GridMap
 
   // function
   void init(int x_size, int y_size);
+  void init(int x_size, int y_size, T value);
   void free();
   bool isEmpty();
   bool inScope(int x, int y);
@@ -73,26 +97,37 @@ class GridMap
  private:
   int _x_size = 0;
   int _y_size = 0;
-  T** _array = nullptr;
+  T** _map = nullptr;
   // function
-  void initByValue(int x_size, int y_size, T value);
-  void initArray();
-  void cloneArray(T** other_array);
-  void freeArray();
-  void refreshValue(T value);
+  void initMap();
+  void copyMap(T** other_map);
+  void freeMap();
+  void deassign(T value);
 };
+
+// public
 
 template <typename T>
 inline void GridMap<T>::init(int x_size, int y_size)
 {
   if constexpr (std::is_same<T, int>::value) {
-    initByValue(x_size, y_size, 0);
+    init(x_size, y_size, 0);
   } else if constexpr (std::is_same<T, double>::value) {
-    initByValue(x_size, y_size, 0.0);
+    init(x_size, y_size, 0.0);
   } else {
     T value;
-    initByValue(x_size, y_size, value);
+    init(x_size, y_size, value);
   }
+}
+
+template <typename T>
+inline void GridMap<T>::init(int x_size, int y_size, T value)
+{
+  freeMap();
+  _x_size = x_size;
+  _y_size = y_size;
+  initMap();
+  deassign(value);
 }
 
 template <typename T>
@@ -100,7 +135,7 @@ void GridMap<T>::free()
 {
   _x_size = 0;
   _y_size = 0;
-  freeArray();
+  freeMap();
 }
 
 template <typename T>
@@ -115,60 +150,55 @@ inline bool GridMap<T>::inScope(int x, int y)
   return 0 <= x && x < _x_size && 0 <= y && y < _y_size;
 }
 
+// private
+
 template <typename T>
-inline void GridMap<T>::cloneArray(T** other_array)
+inline void GridMap<T>::initMap()
+{
+  if (_x_size < 0 || _y_size < 0) {
+    std::cout << "[GridMap<T> Error] The map size setting error!" << std::endl;
+    assert(false);
+  }
+  if (_x_size == 0 || _y_size == 0) {
+    _map = nullptr;
+  }
+  _map = new T*[_x_size];
+  _map[0] = new T[_x_size * _y_size];
+  for (int i = 1; i < _x_size; i++) {
+    _map[i] = _map[i - 1] + _y_size;
+  }
+}
+
+template <typename T>
+inline void GridMap<T>::copyMap(T** other_map)
 {
   for (int i = 0; i < _x_size; i++) {
     for (int j = 0; j < _y_size; j++) {
-      _array[i][j] = other_array[i][j];
+      _map[i][j] = other_map[i][j];
     }
   }
 }
 
 template <typename T>
-inline void GridMap<T>::initByValue(int x_size, int y_size, T value)
+inline void GridMap<T>::freeMap()
 {
-  freeArray();
-  _x_size = x_size;
-  _y_size = y_size;
-  initArray();
-  refreshValue(value);
+  if (_map) {
+    delete[] _map[0];
+  }
+  delete[] _map;
+  _map = nullptr;
 }
 
 template <typename T>
-inline void GridMap<T>::freeArray()
-{
-  if (_array) {
-    delete[] _array[0];
-  }
-  delete[] _array;
-  _array = nullptr;
-}
-
-template <typename T>
-inline void GridMap<T>::initArray()
-{
-  assert(_x_size >= 0 && _y_size >= 0);
-  if (_x_size == 0 || _y_size == 0) {
-    _array = nullptr;
-  }
-  _array = new T*[_x_size];
-  _array[0] = new T[_x_size * _y_size];
-  for (int i = 1; i < _x_size; i++) {
-    _array[i] = _array[i - 1] + _y_size;
-  }
-}
-
-template <typename T>
-inline void GridMap<T>::refreshValue(T value)
+inline void GridMap<T>::deassign(T value)
 {
   for (int i = 0; i < _x_size; i++) {
     for (int j = 0; j < _y_size; j++) {
-      _array[i][j] = value;
+      _map[i][j] = value;
     }
   }
 }
 
 }  // namespace astar
 
-#endif  // ISR_GRIDMAP_H_
+#endif  // ASTAR_INCLUDE_GRIDMAP_H_
