@@ -66,7 +66,7 @@ class Model
   void initGridMap();
   void addStartNodeToGridMap(const Coordinate& coord);
   void addEndNodeToGridMap(const Coordinate& coord);
-  void addObsToGridMap();
+  void addOBSToGridMap();
   void legalizeCostMap();
   void addCostToGridMap();
   void initStartNode();

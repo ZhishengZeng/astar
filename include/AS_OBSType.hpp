@@ -2,22 +2,22 @@
  * @Author: Zhisheng Zeng
  * @Date: 2021-09-17 12:03:44
  * @Description:
- * @LastEditors: Zhisheng Zeng
- * @LastEditTime: 2021-12-06 15:03:09
- * @FilePath: /astar/include/ObsType.h
+ * @LastEditors: ZhishengZeng zhishengzeng@163.com
+ * @LastEditTime: 2022-06-08 12:17:29
+ * @FilePath: /astar/include/OBSType.h
  */
 #ifndef ASTAR_INCLUDE_OBSTYPE_H_
 #define ASTAR_INCLUDE_OBSTYPE_H_
 
 namespace astar {
 
-enum class ObsType
+enum class OBSType
 {
   kNone = 0,
-  kEastObs = 1,
-  kWestObs = 2,
-  kSouthObs = 3,
-  kNorthObs = 4
+  kEastOBS = 1,
+  kWestOBS = 2,
+  kSouthOBS = 3,
+  kNorthOBS = 4
 };
 
 }  // namespace astar

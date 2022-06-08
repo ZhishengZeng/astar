@@ -11,7 +11,7 @@
 #define ASTAR_INCLUDE_NODE_H_
 
 #include "AS_Coordinate.hpp"
-#include "AS_ObsType.hpp"
+#include "AS_OBSType.hpp"
 #include "AS_SearchState.hpp"
 
 #define LENGTH_UNIT 1

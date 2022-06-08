@@ -6,13 +6,13 @@ SET(CMAKE_VERBOSE_MAKEFILE OFF)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 INCLUDE_DIRECTORIES(
-${PROJECT_SOURCE_DIR}/include
-${PROJECT_SOURCE_DIR}/third_party/googletest
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/third_party/googletest
 )
 
 ADD_LIBRARY(astar
-${PROJECT_SOURCE_DIR}/src/Model.cpp
-${PROJECT_SOURCE_DIR}/src/Util.cpp
+    ${PROJECT_SOURCE_DIR}/src/Model.cpp
+    ${PROJECT_SOURCE_DIR}/src/Util.cpp
 )
 
 # ADD_COMPILE_OPTIONS("-fsanitize=address")

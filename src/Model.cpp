@@ -138,7 +138,7 @@ void Model::init(const Coordinate& start_coord, const Coordinate& end_coord)
   initGridMap();
   addStartNodeToGridMap(start_coord);
   addEndNodeToGridMap(end_coord);
-  addObsToGridMap();
+  addOBSToGridMap();
   legalizeCostMap();
   addCostToGridMap();
   initStartNode();
@@ -177,7 +177,7 @@ void Model::addEndNodeToGridMap(const Coordinate& coord)
   _end = &_grid_map[coord.get_x()][coord.get_y()];
 }
 
-void Model::addObsToGridMap()
+void Model::addOBSToGridMap()
 {
   std::map<Coordinate, std::map<Orientation, bool>, cmpCoordinate>& coord_obs_map = _config.get_coord_obs_map();
 

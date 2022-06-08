@@ -13,7 +13,7 @@
 
 #include "AS_Coordinate.hpp"
 #include "AS_Orientation.hpp"
-#include "AS_ObsType.hpp"
+#include "AS_OBSType.hpp"
 
 namespace astar {
 
